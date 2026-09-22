@@ -44,7 +44,12 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.temporal-sector')).toHaveLength(12);
     expect(svg.querySelectorAll('.period-pointer')).toHaveLength(1);
     expect(svg.querySelectorAll('.hour-ray')).toHaveLength(13);
+    expect(svg.querySelectorAll('.hour-label')).toHaveLength(13);
+    expect([...svg.querySelectorAll('.hour-label')].map(({ textContent }) => textContent)).toEqual([
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+    ]);
     expect(svg.querySelectorAll('.horizon-line')).toHaveLength(1);
+    expect(svg.querySelectorAll('.inner-dial')).toHaveLength(1);
     expect(svg.querySelectorAll('.civil-time-label')).toHaveLength(5);
     expect(svg.querySelectorAll('.current')).toHaveLength(1);
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');

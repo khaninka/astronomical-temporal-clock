@@ -109,16 +109,19 @@ export function renderClockFace(svg, model) {
     title.textContent = `${segment.period} ${segment.hour}: ${formatClockTime(segment.start)}–${formatClockTime(segment.end)}`;
     path.append(title);
     svg.append(path);
-    const labelPoint = polarPoint(198, (segment.startAngle+segment.endAngle)/2);
-    const label = svgElement('text', { x: labelPoint.x, y: labelPoint.y, class: 'sector-label' });
-    label.textContent = String(segment.hour);
-    svg.append(label);
   }
+
+  svg.append(svgElement('path', { d: sectorPath(START_ANGLE, END_ANGLE, 158), class: 'inner-dial' }));
 
   for (let boundary = 0; boundary <= HOURS_PER_PERIOD; boundary += 1) {
     const angle = START_ANGLE+boundary/HOURS_PER_PERIOD*SWEEP_ANGLE;
+    const start = polarPoint(158, angle);
     const end = polarPoint(225, angle);
-    svg.append(svgElement('line', { x1: CENTER_X, y1: CENTER_Y, x2: end.x, y2: end.y, class: 'hour-ray' }));
+    svg.append(svgElement('line', { x1: start.x, y1: start.y, x2: end.x, y2: end.y, class: 'hour-ray' }));
+    const labelPoint = polarPoint(218, angle);
+    const label = svgElement('text', { x: labelPoint.x, y: labelPoint.y, class: 'hour-label' });
+    label.textContent = String(boundary);
+    svg.append(label);
   }
 
   svg.append(svgElement('path', { d: arcPath(145, START_ANGLE, END_ANGLE), class: 'civil-arc' }));
