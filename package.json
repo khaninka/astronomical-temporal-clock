@@ -1,0 +1,23 @@
+{
+  "name": "astronomical-temporal-clock",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "verify:spa": "node scripts/verify-nrel-spa.js",
+    "verify:oracle": "node scripts/verify-astronomy-engine.js",
+    "verify:matrix": "node scripts/verify-matrix.js",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4",
+    "astronomy-engine": "^2.1.19",
+    "jsdom": "^26.1.0",
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
+  }
+}
