@@ -1,7 +1,6 @@
 # Astronomical Temporal Clock
 
 A browser-only astronomical temporal clock, built with JavaScript ES Modules, HTML, CSS, Vite, and Vitest. There is no framework and no backend.
-...
 
 ## Delivery pipeline
 
