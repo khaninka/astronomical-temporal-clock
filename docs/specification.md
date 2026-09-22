@@ -61,7 +61,7 @@ The public OpenTopoData endpoint was evaluated but cannot be called directly fro
 
 If the lookup is not used or fails, missing browser altitude requires manual elevation entry.
 
-Calculation date defaults to the device-local calendar date but is editable for integration testing and historical/future calculations. **Use device date** resets it to the current device date. No calculation time-of-day is accepted. The date is interpreted in the device's local timezone; coordinates do not change or infer a timezone.
+The live clock always uses the current device-local calendar date. A separate diagnostic date defaults to that date but remains editable for integration testing and historical/future BoundaryRule calculations. **Use device date** resets the diagnostic value. No calculation time-of-day is accepted. Dates are interpreted in the device's local timezone; coordinates do not change or infer a timezone.
 
 **Confirm location** validates and produces `LocationData` for the in-memory pipeline. It does not persist coordinates or time across page reloads.
 
@@ -108,10 +108,12 @@ The current device time must be classified explicitly against the calculated bou
 
 This live classification is shown only when the selected calculation date is the device's current local date. Historical and future dates show calculated boundaries without claiming a current state.
 
-## 8. M5 — Display (not implemented)
+## 8. M5 — Display (implemented)
+
+The interface uses four tabs: `Location`, `Astronomical Temporal Clock`, `BoundaryRule`, and `TemporalClock`. Location is shown until validated coordinates/elevation exist; then the clock is the default. Latitude, longitude, and elevation are stored only for the current tab session, while dates are never persisted. The diagnostic date cannot change the live clock date.
 
 The first display is diagnostic, showing device-local time, inputs, all intermediate astronomical/boundary values, temporal time, and temporal-hour duration. A decorative clock face follows only after full-pipeline integration succeeds.
 
 ## 9. Explicit exclusions for the current milestone
 
-M1 contains no `SunCrossing`, `BoundaryRule`, `TemporalClock`, full diagnostic `Display`, weather input, light sensor, local-shadow model, backend, persistence, or framework.
+The completed browser prototype contains no weather input, light sensor, local-shadow model, backend, account, or framework. Its only persistence is validated latitude, longitude, and elevation in tab-scoped session storage.

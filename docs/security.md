@@ -19,7 +19,7 @@ Security findings are classified as `critical`, `high`, `moderate`, `low`, or `i
 
 ### Scope and data flow
 
-M1 receives latitude, longitude, elevation, and device-local date/time. Browser geolocation is requested only after the user presses **Use my location**. The values remain inside the current page and are not sent over the network, written to storage, logged, or persisted by application code unless the user explicitly opens the Google Maps verification link. Opening that link sends latitude and longitude to Google Maps.
+M1 receives latitude, longitude, elevation, and device-local date/time. Browser geolocation is requested only after the user presses **Use my location**. Validated latitude, longitude, and elevation are kept in tab-scoped session storage after **Next/Done** or a valid tab transition; dates are not persisted. Values are not sent over the network unless the user requests Open-Meteo elevation or explicitly opens the Google Maps verification link.
 
 There is no backend, authentication, account, cookie, database, analytics, third-party script, external API call, or application secret.
 
@@ -28,7 +28,7 @@ There is no backend, authentication, account, cookie, database, analytics, third
 - Latitude and longitude are required, converted to finite numbers, and range-checked.
 - Elevation is required and must be a finite number.
 - Device date/time must be a valid `Date`.
-- The editable calculation date is parsed as a real device-local calendar date before entering `LocationData`; it has no time-of-day component and is not persisted.
+- The editable diagnostic date is parsed as a real device-local calendar date before entering `LocationData`; it has no time-of-day component, cannot alter the live clock's current date, and is not persisted.
 - Browser geolocation errors are converted to controlled user messages.
 - Missing browser altitude is represented as unknown rather than silently converted to a plausible physical value.
 - User-derived values and errors are rendered with `textContent`, not HTML insertion.
@@ -52,7 +52,7 @@ The repository does not yet define a Content Security Policy or deployment respo
 
 #### Low — precise location is displayed in the page
 
-Coordinates are privacy-sensitive. They are not stored by this version. Clicking **Check coordinates in Google Maps** intentionally transmits latitude and longitude to Google, subject to Google's privacy practices. No transmission occurs merely by displaying the link. New modules must not add automatic transmission or persistence without an explicit requirement, disclosure, and consent model.
+Coordinates are privacy-sensitive. This version stores validated latitude, longitude, and elevation in origin- and tab-scoped `sessionStorage`; the browser removes them when the tab session ends. Any script executing on the same origin in that tab could read them. Clicking **Check coordinates in Google Maps** intentionally transmits latitude and longitude to Google, subject to Google's privacy practices. No transmission occurs merely by displaying the link.
 
 #### Resolved — elevation domain bounds
 
@@ -130,4 +130,8 @@ All rendered values use `textContent`. M4 adds no network request, permission, p
 
 The current M5 face derives a fixed set of 12 sectors for the active DAY or NIGHT period from the already validated and bounded M4 schedule. Rendering work is constant-size once per second. SVG nodes and labels are created with DOM methods, fixed element names, fixed attributes, and `textContent`; no untrusted HTML is interpreted. Invalid or missing boundaries are rejected instead of drawing a misleading clock. The pointer and ordinary-time scale share the same validated period fraction, avoiding the misleading 24-hour/12-hour synchronization of the rejected full-circle prototype.
 
-M5 adds no network request, browser permission, storage, secret, backend, external script, or runtime dependency. The existing diagnostic screen remains present for traceability. No critical or high finding is present. The development-only Vitest advisory and production CSP/header work remain unchanged; M5 stays active pending visual and integration approval.
+M5 adds no automatic network request, browser permission, secret, backend, external script, or runtime dependency. It stores only validated latitude, longitude, and elevation in session storage by explicit user requirement; no date or calculated result is stored. The diagnostic views remain present for traceability. No critical or high finding is present. The development-only Vitest advisory and production CSP/header work remain required before public deployment.
+
+### Tabs and persistence addendum
+
+Four ARIA tabs separate Location, the clock, BoundaryRule, and TemporalClock. Disabled tabs prevent presenting unavailable calculations; arrow, Home, and End navigation is supported after tabs become available. Persistence is deliberately limited to three validated numbers in `sessionStorage`. Stored values are validated again before calculation, storage failures degrade to in-memory operation, and the device-local current date is regenerated on every load. No HTML interpretation, dependency, permission, or automatic transmission was added.

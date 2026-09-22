@@ -16,6 +16,8 @@ const deviceDateButton = document.querySelector('#use-device-date');
 const timeElement = document.querySelector('#local-date-time');
 const statusElement = document.querySelector('#status');
 const mapLink = document.querySelector('#map-link');
+const primaryLocationButton = document.querySelector('#location-next');
+const revertLocationButton = document.querySelector('#revert-location');
 const crossingResults = document.querySelector('#crossing-results');
 const crossingDate = document.querySelector('#crossing-date');
 const crossingReference = document.querySelector('#crossing-reference');
@@ -36,14 +38,67 @@ const temporalPeriod = document.querySelector('#temporal-period');
 const temporalTime = document.querySelector('#temporal-time');
 const temporalInterval = document.querySelector('#temporal-interval');
 const temporalHourDuration = document.querySelector('#temporal-hour-duration');
+const temporalContext = document.querySelector('#temporal-context');
 const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const clockReadout = document.querySelector('#clock-readout');
 const clockMode = document.querySelector('#clock-mode');
+const tabs = {
+  location: document.querySelector('#tab-location'),
+  clock: document.querySelector('#tab-clock'),
+  boundary: document.querySelector('#tab-boundary'),
+  temporal: document.querySelector('#tab-temporal'),
+};
+const views = {
+  location: document.querySelector('#view-location'),
+  clock: clockDisplay,
+  boundary: crossingResults,
+  temporal: temporalResults,
+};
+const LOCATION_STORAGE_KEY = 'astronomical-temporal-clock.location.v1';
 let temporalSchedule = null;
+let temporalReferenceTime = null;
+let temporalIsLive = false;
 let displaySchedule = null;
 let displayReferenceTime = null;
 let displayIsLive = false;
+let savedLocation = null;
+
+function selectTab(name) {
+  if (tabs[name].disabled) return;
+  for (const [tabName, tab] of Object.entries(tabs)) {
+    const selected = tabName === name;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    views[tabName].hidden = !selected;
+  }
+}
+
+function requestTab(name) {
+  const leavingLocation = !views.location.hidden && name !== 'location';
+  if (leavingLocation && savedLocation) {
+    calculateFromForm(name);
+    return;
+  }
+  selectTab(name);
+}
+
+for (const [name, tab] of Object.entries(tabs)) {
+  tab.addEventListener('click', () => requestTab(name));
+  tab.addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const enabledNames = Object.keys(tabs).filter((tabName) => !tabs[tabName].disabled);
+    const currentIndex = enabledNames.indexOf(name);
+    const targetName = event.key === 'Home'
+      ? enabledNames[0]
+      : event.key === 'End'
+        ? enabledNames.at(-1)
+        : enabledNames[(currentIndex+(event.key === 'ArrowRight' ? 1 : -1)+enabledNames.length)%enabledNames.length];
+    requestTab(targetName);
+    tabs[targetName].focus();
+  });
+}
 
 function sameLocalDate(a, b) {
   return a.getFullYear() === b.getFullYear()
@@ -52,11 +107,10 @@ function sameLocalDate(a, b) {
 }
 
 function renderTemporalClock(now = new Date()) {
-  if (!temporalSchedule || !sameLocalDate(temporalSchedule.current.localDateTime, now)) {
-    temporalResults.hidden = true;
-  } else {
+  if (temporalSchedule) {
+    const referenceTime = temporalIsLive ? now : temporalReferenceTime;
     const result = calculateTemporalClock({
-      referenceTime: now,
+      referenceTime,
       previous: temporalSchedule.previous,
       current: temporalSchedule.current,
       next: temporalSchedule.next,
@@ -65,10 +119,11 @@ function renderTemporalClock(now = new Date()) {
     temporalTime.textContent = formatTemporalTime(result);
     temporalInterval.textContent = `${formatLocalDateTime(result.periodStart)} → ${formatLocalDateTime(result.periodEnd)}`;
     temporalHourDuration.textContent = `${(result.temporalHourDurationMilliseconds/60_000).toFixed(6)} ordinary minutes`;
-    temporalResults.hidden = false;
+    temporalContext.textContent = temporalIsLive
+      ? 'Live result for the current device date'
+      : `Diagnostic preview for ${formatLocalDate(referenceTime)} at 12:00`;
   }
   if (!displaySchedule) {
-    clockDisplay.hidden = true;
     return;
   }
   const clockTime = displayIsLive ? now : displayReferenceTime;
@@ -81,7 +136,6 @@ function renderTemporalClock(now = new Date()) {
   renderClockFace(clockSvg, createClockFaceModel(displaySchedule, clockTime));
   clockReadout.textContent = `${displayResult.period} ${formatTemporalTime(displayResult)}`;
   clockMode.textContent = displayIsLive ? 'Live · device local time' : `Selected-date preview · ${formatLocalDate(clockTime)} at 12:00`;
-  clockDisplay.hidden = false;
 }
 
 function renderCrossing(element, utcElement, crossing) {
@@ -103,7 +157,6 @@ function renderCrossings(calculation) {
   renderCrossing(dayEndLocal, dayEndUtc, model.dayEnd);
   cycleStatus.textContent = model.liveComparison ?? '';
   cycleStatus.hidden = model.liveComparison === null;
-  crossingResults.hidden = false;
 }
 
 function showMapLink(location) {
@@ -131,31 +184,99 @@ function showValidationErrors(errors) {
   form.reportValidity();
 }
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
+function saveLocation(location) {
+  try {
+    const stored = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      elevation: location.elevation,
+    };
+    sessionStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(stored));
+    savedLocation = stored;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function calculateFromForm(targetTab = 'clock') {
   clearValidity();
   try {
-    const location = createLocationData(currentFormValues());
-    const crossings = calculateLocationBoundaries(location);
+    const values = currentFormValues();
+    const diagnosticLocation = createLocationData(values);
+    const crossings = calculateLocationBoundaries(diagnosticLocation);
     renderCrossings(crossings);
     const now = new Date();
-    displayIsLive = sameLocalDate(location.localDateTime, now);
-    displayReferenceTime = displayIsLive
+    temporalIsLive = sameLocalDate(diagnosticLocation.localDateTime, now);
+    temporalReferenceTime = temporalIsLive
       ? now
-      : new Date(location.localDateTime.getFullYear(), location.localDateTime.getMonth(), location.localDateTime.getDate(), 12);
-    const displayTemporal = calculateLocationTemporalClock(location, displayReferenceTime);
-    displaySchedule = displayTemporal.state === 'AVAILABLE' ? displayTemporal : null;
-    const liveTemporal = sameLocalDate(location.localDateTime, now)
-      ? calculateLocationTemporalClock(location, now)
-      : null;
-    temporalSchedule = liveTemporal?.state === 'AVAILABLE' ? liveTemporal : null;
+      : new Date(diagnosticLocation.localDateTime.getFullYear(), diagnosticLocation.localDateTime.getMonth(), diagnosticLocation.localDateTime.getDate(), 12);
+    const diagnosticTemporal = calculateLocationTemporalClock(diagnosticLocation, temporalReferenceTime);
+    const liveLocation = createLocationData({ ...values, localDateTime: formatLocalDateInput(now) });
+    displayIsLive = true;
+    displayReferenceTime = now;
+    const liveTemporal = calculateLocationTemporalClock(liveLocation, now);
+    displaySchedule = liveTemporal.state === 'AVAILABLE' ? liveTemporal : null;
+    temporalSchedule = diagnosticTemporal?.state === 'AVAILABLE' ? diagnosticTemporal : null;
     renderTemporalClock(now);
-    statusElement.textContent = `Location confirmed: ${location.latitude}, ${location.longitude}, ${location.elevation} m for ${formatLocalDate(location.localDateTime)}. Results are shown below.`;
-    showMapLink(location);
+    tabs.clock.disabled = displaySchedule === null;
+    tabs.boundary.disabled = false;
+    tabs.temporal.disabled = temporalSchedule === null;
+    const persisted = saveLocation(liveLocation);
+    statusElement.textContent = persisted
+      ? 'Saved for this browser session.'
+      : `Location confirmed for this session: ${liveLocation.latitude}, ${liveLocation.longitude}, ${liveLocation.elevation} m. Browser storage was unavailable.`;
+    showMapLink(liveLocation);
+    primaryLocationButton.textContent = 'Done';
+    revertLocationButton.hidden = false;
+    revertLocationButton.disabled = true;
+    if (!tabs[targetTab].disabled) selectTab(targetTab);
+    return true;
   } catch (error) {
     if (error instanceof LocationValidationError) showValidationErrors(error.errors);
     else throw error;
+    return false;
   }
+}
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  calculateFromForm();
+});
+
+function updateDraftState() {
+  if (!savedLocation) return;
+  const changed = latitudeInput.value !== String(savedLocation.latitude)
+    || longitudeInput.value !== String(savedLocation.longitude)
+    || elevationInput.value !== String(savedLocation.elevation);
+  revertLocationButton.disabled = !changed;
+  if (changed) statusElement.textContent = 'Unsaved changes.';
+}
+
+function updateDraftMapLink() {
+  try {
+    mapLink.href = createGoogleMapsUrl(currentFormValues());
+    mapLink.hidden = false;
+  } catch {
+    mapLink.hidden = true;
+  }
+}
+
+for (const input of [latitudeInput, longitudeInput, elevationInput]) {
+  input.addEventListener('input', () => {
+    updateDraftState();
+    if (input !== elevationInput) updateDraftMapLink();
+  });
+}
+
+revertLocationButton.addEventListener('click', () => {
+  if (!savedLocation) return;
+  latitudeInput.value = savedLocation.latitude;
+  longitudeInput.value = savedLocation.longitude;
+  elevationInput.value = savedLocation.elevation;
+  updateDraftMapLink();
+  revertLocationButton.disabled = true;
+  statusElement.textContent = 'Changes reverted to the saved session location.';
 });
 
 deviceDateButton.addEventListener('click', () => {
@@ -192,9 +313,10 @@ locationButton.addEventListener('click', async () => {
     elevationInput.value = location.elevation ?? '';
     clearValidity();
     statusElement.textContent = location.elevation === null
-      ? 'Coordinates received. Elevation was not provided by the device; enter it manually before saving.'
-      : 'Location received. Review and save it.';
+      ? 'Coordinates received. Elevation was not provided by the device; enter it manually before continuing.'
+      : 'Location received. Review it and continue.';
     showMapLink(location);
+    updateDraftState();
   } catch (error) {
     statusElement.textContent = error.message;
   } finally {
@@ -204,6 +326,18 @@ locationButton.addEventListener('click', async () => {
 
 renderDeviceTime();
 calculationDateInput.value = formatLocalDateInput();
+selectTab('location');
+try {
+  const saved = JSON.parse(sessionStorage.getItem(LOCATION_STORAGE_KEY));
+  if (saved && typeof saved === 'object') {
+    latitudeInput.value = saved.latitude;
+    longitudeInput.value = saved.longitude;
+    elevationInput.value = saved.elevation;
+    calculateFromForm();
+  }
+} catch {
+  sessionStorage.removeItem(LOCATION_STORAGE_KEY);
+}
 setInterval(() => {
   const now = new Date();
   renderDeviceTime(now);

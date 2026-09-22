@@ -3,59 +3,78 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Location input for an astronomical temporal clock">
-    <title>Astronomical Temporal Clock — Location</title>
+    <meta name="description" content="Astronomical temporal clock">
+    <title>Astronomical Temporal Clock</title>
     <link rel="stylesheet" href="/src/styles.css">
   </head>
   <body>
     <main class="panel">
-      <p class="eyebrow">Astronomical Temporal Clock</p>
-      <h1>Location</h1>
-      <p class="intro">Set the observation point used by the clock.</p>
+      <header class="app-header"><h1>Astronomical Temporal Clock</h1></header>
+      <nav class="tab-list" role="tablist" aria-label="Clock sections">
+        <button id="tab-location" role="tab" aria-selected="true" aria-controls="view-location" type="button">Location</button>
+        <button id="tab-clock" role="tab" aria-selected="false" aria-controls="clock-display" type="button" disabled>Astronomical Temporal Clock</button>
+        <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>BoundaryRule</button>
+        <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>TemporalClock</button>
+      </nav>
 
-      <form id="location-form" novalidate>
-        <label>
-          Latitude
-          <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" required inputmode="decimal">
-          <span class="hint">−90 to 90 degrees</span>
-        </label>
-        <label>
-          Longitude
-          <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" required inputmode="decimal">
-          <span class="hint">−180 to 180 degrees</span>
-        </label>
-        <label>
-          Elevation
-          <span class="input-with-unit">
-            <input id="elevation" name="elevation" type="number" min="-500" max="10000" step="any" required inputmode="decimal">
-            <span>m</span>
-          </span>
-        </label>
-        <label>
-          Calculation date
-          <input id="calculation-date" name="localDateTime" type="date" required>
-          <span class="hint">Calendar date in the device's local timezone</span>
-        </label>
-
-        <button id="use-location" type="button">Use my location</button>
-        <button id="get-elevation" type="button">Get terrain elevation</button>
-        <p id="elevation-source" class="source-note" hidden></p>
-        <button id="use-device-date" type="button">Use device date</button>
-        <button type="submit" class="primary">Confirm location</button>
-      </form>
-
-      <section class="device-time" aria-labelledby="device-time-heading">
-        <h2 id="device-time-heading">Device date and time</h2>
-        <time id="local-date-time"></time>
+      <section id="view-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
+        <h2>Location</h2>
+        <p class="intro">Set the observation point used by the clock.</p>
+        <form id="location-form" novalidate>
+          <div class="coordinate-grid">
+            <label>Latitude
+              <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" required inputmode="decimal">
+              <span class="hint">−90 to 90 degrees</span>
+            </label>
+            <label>Longitude
+              <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" required inputmode="decimal">
+              <span class="hint">−180 to 180 degrees</span>
+            </label>
+          </div>
+          <div class="coordinate-actions">
+            <button id="use-location" type="button">Use my location</button>
+            <a id="map-link" class="map-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Check coordinates in Google Maps</a>
+          </div>
+          <label>Elevation
+            <span class="elevation-row">
+              <span class="input-with-unit">
+                <input id="elevation" name="elevation" type="number" min="-500" max="10000" step="any" required inputmode="decimal">
+                <span>m</span>
+              </span>
+              <button id="get-elevation" type="button">Get terrain elevation</button>
+            </span>
+          </label>
+          <details class="test-controls">
+            <summary>Diagnostic test date</summary>
+            <label>Calculation date
+              <input id="calculation-date" name="localDateTime" type="date" required>
+              <span class="hint">Used by BoundaryRule and TemporalClock tests only. The clock always uses today's device date.</span>
+            </label>
+            <button id="use-device-date" type="button">Use device date</button>
+            <section class="device-time" aria-labelledby="device-time-heading">
+              <h2 id="device-time-heading">Device date and time</h2>
+              <time id="local-date-time"></time>
+            </section>
+          </details>
+          <p id="elevation-source" class="source-note" hidden></p>
+          <div class="form-actions">
+            <button id="revert-location" type="button" hidden disabled>Revert changes</button>
+            <button id="location-next" type="submit" class="primary">Next</button>
+          </div>
+        </form>
+        <p id="status" role="status" aria-live="polite"></p>
       </section>
-      <p id="status" role="status" aria-live="polite"></p>
-      <section id="crossing-results" class="crossing-results" aria-labelledby="crossing-results-heading" hidden>
-        <h2 id="crossing-results-heading">BoundaryRule</h2>
-        <p class="result-context">
-          <span id="crossing-date"></span><span aria-hidden="true"> · </span>
-          <span id="crossing-reference"></span><span aria-hidden="true"> · </span>
-          Ideal horizon dip <span id="horizon-dip"></span>
-        </p>
+
+      <section id="clock-display" class="tab-panel clock-display" role="tabpanel" aria-labelledby="tab-clock" hidden>
+        <p id="clock-mode" class="clock-mode"></p>
+        <svg id="clock-face" class="clock-face"></svg>
+        <output id="clock-readout" class="clock-readout" aria-live="off"></output>
+        <div class="clock-legend" aria-hidden="true"><span class="day-key">DAY</span><span class="night-key">NIGHT</span></div>
+      </section>
+
+      <section id="crossing-results" class="tab-panel crossing-results" role="tabpanel" aria-labelledby="tab-boundary" hidden>
+        <h2>BoundaryRule</h2>
+        <p class="result-context"><span id="crossing-date"></span><span aria-hidden="true"> · </span><span id="crossing-reference"></span><span aria-hidden="true"> · </span>Ideal horizon dip <span id="horizon-dip"></span></p>
         <dl>
           <div><dt>Netz anchor · <span id="rising-target"></span></dt><dd id="rising-local"></dd><dd id="rising-utc" class="utc-time"></dd></div>
           <div><dt>DAY starts · Alot hashachar · netz −72 min</dt><dd id="day-start-local"></dd><dd id="day-start-utc" class="utc-time"></dd></div>
@@ -65,9 +84,10 @@
         <p id="cycle-status" class="cycle-status" hidden></p>
         <p class="source-note">Shkiah uses elevation and an ideal unobstructed horizon. Surrounding terrain and buildings are not modelled.</p>
       </section>
-      <section id="temporal-results" class="crossing-results temporal-results" aria-labelledby="temporal-results-heading" hidden>
-        <h2 id="temporal-results-heading">TemporalClock</h2>
-        <p class="result-context">Live result for the current device date</p>
+
+      <section id="temporal-results" class="tab-panel crossing-results temporal-results" role="tabpanel" aria-labelledby="tab-temporal" hidden>
+        <h2>TemporalClock</h2>
+        <p id="temporal-context" class="result-context"></p>
         <dl>
           <div><dt>Period</dt><dd id="temporal-period"></dd></div>
           <div><dt>Temporal time</dt><dd id="temporal-time" class="temporal-time"></dd></div>
@@ -75,17 +95,6 @@
           <div><dt>One temporal hour</dt><dd id="temporal-hour-duration"></dd></div>
         </dl>
       </section>
-      <section id="clock-display" class="clock-display" aria-labelledby="clock-display-heading" hidden>
-        <h2 id="clock-display-heading">Astronomical Temporal Clock</h2>
-        <p class="result-context">The semicircle shows the current 12-hour DAY or NIGHT period. One pointer synchronizes astronomical and ordinary time.</p>
-        <p id="clock-mode" class="clock-mode"></p>
-        <svg id="clock-face" class="clock-face"></svg>
-        <output id="clock-readout" class="clock-readout" aria-live="off"></output>
-        <div class="clock-legend" aria-hidden="true"><span class="day-key">DAY</span><span class="night-key">NIGHT</span></div>
-      </section>
-      <a id="map-link" class="map-link" href="#" target="_blank" rel="noopener noreferrer" hidden>
-        Check coordinates in Google Maps
-      </a>
     </main>
     <script type="module" src="/src/app.js"></script>
   </body>

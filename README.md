@@ -20,7 +20,7 @@ The project decisions are kept as separate documents rather than collapsed into 
 
 The astronomy implementation is based on the published report [NREL Solar Position Algorithm, NREL/TP-560-34302](https://docs.nlr.gov/docs/fy08osti/34302.pdf). It is an independent implementation; the separately licensed reference C source is not copied into this project.
 
-## Current milestone: M5 Display
+## Current milestone: M5 Display — complete
 
 `Location` is complete and integrated in the browser. It provides:
 
@@ -37,9 +37,9 @@ The M2 calculation core now provides:
 - an explicit `NO_CROSSING` result for polar/no-event intervals;
 - canonical NREL regression tests and Astronomy Engine as a development-only oracle.
 
-M2, M3, and M4 are complete. M5 is active: the existing diagnostic screen remains available, and the current graphical prototype shows the active DAY or NIGHT period as twelve astronomical sectors on a semicircle. A shared pointer synchronizes those sectors with an inner ordinary-time scale. The display is rebuilt from the selected date, coordinates, and elevation.
+M1 through M5 are complete for the local v1 prototype. Four accessible tabs switch between `Location`, `Astronomical Temporal Clock`, `BoundaryRule`, and `TemporalClock`. A first visit opens Location; after valid data is saved, the live clock opens automatically and later visits restore it. The clock shows the active DAY or NIGHT period as twelve astronomical sectors between boundary labels `0…12` on a semicircle. A shared pointer synchronizes those sectors with an always-light inner ordinary-time scale.
 
-If the browser does not provide a reliable altitude, elevation remains empty. The user can enter it manually or explicitly request estimated terrain elevation. Location data is kept in the page only; persistence belongs to a future explicit requirement.
+If the browser does not provide a reliable altitude, elevation remains empty. The user can enter it manually or explicitly request estimated terrain elevation. Validated latitude, longitude, and elevation are saved only in the current tab session (`sessionStorage`). The live clock always uses the current device-local date. An editable date remains under **Diagnostic test date** and affects only BoundaryRule and diagnostic TemporalClock output.
 
 ## Run locally
 

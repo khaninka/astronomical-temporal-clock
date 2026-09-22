@@ -3,19 +3,29 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const formMarkup = `
-  <form id="location-form">
-    <input id="latitude" name="latitude">
-    <input id="longitude" name="longitude">
-    <input id="elevation" name="elevation">
-    <input id="calculation-date" name="localDateTime" type="date">
-    <button id="use-location" type="button">Use my location</button>
-    <button id="get-elevation" type="button">Get terrain elevation</button>
-    <p id="elevation-source" hidden></p>
-    <button id="use-device-date" type="button">Use device date</button>
-    <button type="submit">Save</button>
-  </form>
-  <time id="local-date-time"></time>
-  <p id="status"></p>
+  <nav>
+    <button id="tab-location" aria-selected="true">Location</button>
+    <button id="tab-clock" aria-selected="false" disabled>Clock</button>
+    <button id="tab-boundary" aria-selected="false" disabled>Boundary</button>
+    <button id="tab-temporal" aria-selected="false" disabled>Temporal</button>
+  </nav>
+  <section id="view-location">
+    <form id="location-form">
+      <input id="latitude" name="latitude">
+      <input id="longitude" name="longitude">
+      <input id="elevation" name="elevation">
+      <input id="calculation-date" name="localDateTime" type="date">
+      <button id="use-location" type="button">Use my location</button>
+      <button id="get-elevation" type="button">Get terrain elevation</button>
+      <p id="elevation-source" hidden></p>
+      <button id="use-device-date" type="button">Use device date</button>
+      <button id="revert-location" type="button" hidden disabled>Revert changes</button>
+      <button id="location-next" type="submit">Next</button>
+    </form>
+    <time id="local-date-time"></time>
+    <p id="status"></p>
+    <a id="map-link" href="#" hidden>Map</a>
+  </section>
   <section id="crossing-results" hidden>
     <span id="crossing-date"></span><span id="crossing-reference"></span><span id="horizon-dip"></span>
     <span id="rising-target"></span><span id="setting-target"></span>
@@ -26,21 +36,46 @@ const formMarkup = `
     <span id="cycle-status" hidden></span>
   </section>
   <section id="temporal-results" hidden>
+    <p id="temporal-context"></p>
     <span id="temporal-period"></span><span id="temporal-time"></span>
     <span id="temporal-interval"></span><span id="temporal-hour-duration"></span>
   </section>
   <section id="clock-display" hidden>
     <p id="clock-mode"></p><svg id="clock-face"></svg><output id="clock-readout"></output>
   </section>
-  <a id="map-link" href="#" hidden>Map</a>
 `;
 
 describe('Location browser integration', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.resetModules();
+    sessionStorage.clear();
     document.body.innerHTML = formMarkup;
     HTMLFormElement.prototype.reportValidity = vi.fn(() => true);
+  });
+
+  it('opens Location first and switches between enabled tabs', async () => {
+    await import('../src/app.js');
+    expect(document.querySelector('#view-location').hidden).toBe(false);
+    expect(document.querySelector('#tab-location').getAttribute('aria-selected')).toBe('true');
+    expect(document.querySelector('#tab-clock').disabled).toBe(true);
+  });
+
+  it('restores saved coordinates and elevation while using today for the live clock', async () => {
+    vi.setSystemTime(new Date(2026, 8, 22, 10, 0, 0));
+    sessionStorage.setItem('astronomical-temporal-clock.location.v1', JSON.stringify({
+      latitude: 31.8,
+      longitude: 35.2,
+      elevation: 800,
+    }));
+    await import('../src/app.js');
+
+    expect(document.querySelector('#latitude').value).toBe('31.8');
+    expect(document.querySelector('#longitude').value).toBe('35.2');
+    expect(document.querySelector('#elevation').value).toBe('800');
+    expect(document.querySelector('#calculation-date').value).toBe('2026-09-22');
+    expect(document.querySelector('#clock-display').hidden).toBe(false);
+    expect(document.querySelector('#tab-clock').getAttribute('aria-selected')).toBe('true');
   });
 
   afterEach(() => {
@@ -78,11 +113,20 @@ describe('Location browser integration', () => {
 
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
-    expect(document.querySelector('#status').textContent).toContain('Location confirmed: 31.8, 35.2, 800 m for');
+    expect(document.querySelector('#status').textContent).toBe('Saved for this browser session.');
+    expect(document.querySelector('#location-next').textContent).toBe('Done');
     expect(document.querySelector('#status').textContent).not.toContain('00:00:00');
     expect(document.querySelector('#local-date-time').textContent).not.toBe('');
     expect(document.querySelector('#map-link').hidden).toBe(false);
     expect(document.querySelector('#map-link').href).toBe('https://www.google.com/maps/search/?api=1&query=31.8%2C35.2');
+    expect(JSON.parse(sessionStorage.getItem('astronomical-temporal-clock.location.v1'))).toEqual({
+      latitude: 31.8,
+      longitude: 35.2,
+      elevation: 800,
+    });
+    expect(document.querySelector('#clock-display').hidden).toBe(false);
+    expect(document.querySelector('#tab-clock').getAttribute('aria-selected')).toBe('true');
+    document.querySelector('#tab-boundary').click();
     expect(document.querySelector('#crossing-results').hidden).toBe(false);
     expect(document.querySelector('#rising-target').textContent).toBe('-0.833300°');
     expect(Number.parseFloat(document.querySelector('#setting-target').textContent)).toBeLessThan(-0.8333);
@@ -92,6 +136,27 @@ describe('Location browser integration', () => {
     expect(document.querySelector('#setting-local').textContent).not.toBe('');
     expect(document.querySelector('#day-start-local').textContent).not.toBe('');
     expect(document.querySelector('#day-end-local').textContent).not.toBe('');
+  });
+
+  it('auto-saves valid edits on tab change and can revert unsaved edits', async () => {
+    await import('../src/app.js');
+    document.querySelector('#latitude').value = '31.8';
+    document.querySelector('#longitude').value = '35.2';
+    document.querySelector('#elevation').value = '800';
+    document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+    document.querySelector('#tab-location').click();
+    document.querySelector('#latitude').value = '32';
+    document.querySelector('#latitude').dispatchEvent(new Event('input', { bubbles: true }));
+    expect(document.querySelector('#revert-location').disabled).toBe(false);
+    document.querySelector('#revert-location').click();
+    expect(document.querySelector('#latitude').value).toBe('31.8');
+
+    document.querySelector('#latitude').value = '32';
+    document.querySelector('#latitude').dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('#tab-boundary').click();
+    expect(document.querySelector('#crossing-results').hidden).toBe(false);
+    expect(JSON.parse(sessionStorage.getItem('astronomical-temporal-clock.location.v1')).latitude).toBe(32);
   });
 
   it('allows the test date to be changed and reset to device time', async () => {
@@ -107,7 +172,7 @@ describe('Location browser integration', () => {
     expect(input.value).toBe('2026-09-22');
   });
 
-  it('shows and advances TemporalClock only for the selected current device date', async () => {
+  it('keeps the live clock on today while the diagnostic date can change', async () => {
     vi.setSystemTime(new Date(2026, 8, 22, 16, 0, 0));
     await import('../src/app.js');
     document.querySelector('#latitude').value = '31.8199732324092';
@@ -116,9 +181,10 @@ describe('Location browser integration', () => {
     document.querySelector('#calculation-date').value = '2026-09-22';
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
-    expect(document.querySelector('#temporal-results').hidden).toBe(false);
     expect(document.querySelector('#clock-display').hidden).toBe(false);
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
+    document.querySelector('#tab-temporal').click();
+    expect(document.querySelector('#temporal-results').hidden).toBe(false);
     expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
     const initial = document.querySelector('#temporal-time').textContent;
     expect(initial).toMatch(/^\d{2}:\d{2}:\d{2}\.\d{3}$/);
@@ -130,8 +196,14 @@ describe('Location browser integration', () => {
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     expect(document.querySelector('#temporal-results').hidden).toBe(true);
     expect(document.querySelector('#clock-display').hidden).toBe(false);
-    expect(document.querySelector('#clock-mode').textContent).toContain('Selected-date preview');
+    expect(document.querySelector('#clock-mode').textContent).toContain('Live');
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
+    document.querySelector('#tab-temporal').click();
+    expect(document.querySelector('#temporal-results').hidden).toBe(false);
+    expect(document.querySelector('#temporal-context').textContent).toContain('Diagnostic preview');
+    document.querySelector('#tab-boundary').click();
+    expect(document.querySelector('#crossing-results').hidden).toBe(false);
+    expect(document.querySelector('#crossing-date').textContent).not.toBe('');
   });
 
   it('fills editable fields from browser geolocation', async () => {

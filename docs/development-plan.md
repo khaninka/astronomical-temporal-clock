@@ -16,7 +16,7 @@ The web prototype v1 is complete only after M5. Portability to a later embedded/
 
 ## Current status
 
-M1 through M4 are complete. The user approved M4 after checking both DAY and NIGHT results. M5 is active: the initial unsynchronized full-circle concept was replaced by a shared semicircle for the active DAY or NIGHT period. Twelve temporal sectors and the ordinary-time scale now use the same period fraction and pointer. The diagnostic screen remains available.
+M1 through M5 are complete for the local v1 prototype. Four tabs separate Location, the live clock, BoundaryRule, and TemporalClock. The approved M5 design uses a shared semicircle for the active DAY or NIGHT period. Twelve temporal sectors lie between boundary labels `0…12`; an always-light ordinary-time scale and the temporal sectors use the same period fraction and pointer. Validated coordinates/elevation persist only for the tab session; the production clock date is always today, while the separate diagnostic date remains editable.
 
 The independent NREL SPA implementation passed Appendix A.5 before Astronomy Engine was added as a development-only oracle. The verified generic `SunCrossing` core remains referenced to the astronomical horizon. M3 will define an asymmetric initial boundary profile: standard morning crossing and ideal elevated-horizon shkiah, followed by explicit comparison of the relevant time with shkiah. Civil midnight never starts a new clock cycle. Details are fixed in `sun-crossing-reference.md` and `specification.md`.
 

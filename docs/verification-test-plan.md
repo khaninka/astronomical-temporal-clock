@@ -103,6 +103,8 @@ Run the full computational chain and simulate arbitrary times rather than waitin
 
 Implemented checks cover `0/25/50/75/100%`, real temporal-hour duration, invalid intervals, pre-dawn NIGHT using yesterday's DAY end, DAY, post-DAY NIGHT using tomorrow's DAY start, exact DAY-start and DAY-end transitions, the full `Location → SunCrossing → BoundaryRule → TemporalClock` chain, polar `UNAVAILABLE`, live ticking for today, and suppression of live state for historical/future dates.
 
-## 6. M5 — Display gate (active)
+## 6. M5 — Display gate (complete)
 
 Keep all inputs and intermediate results visible and traceable. Verify manual entry, geolocation, recalculation, DAY/NIGHT transition, error states, and accessibility. For the graphical face, verify twelve equal sectors for the active period, pre-dawn and evening NIGHT selection, the exact DAY-end switch, synchronized pointer fraction, ordinary-time labels, one current-sector highlight, and rebuilding after Location/date/elevation changes.
+
+The approved display passes its unit/integration suite and browser checks for DAY, NIGHT, current-date live mode, selected-date preview, boundary labels `0…12`, a light inner dial, and preserved diagnostic output.
