@@ -16,7 +16,7 @@ body {
 }
 
 .panel {
-  width: min(100%, 42rem);
+  width: min(100%, 48rem);
   padding: clamp(1.5rem, 5vw, 3rem);
   border: 1px solid #cbd5ca;
   border-radius: 1rem;
@@ -100,7 +100,7 @@ button:disabled { cursor: wait; opacity: .6; }
 .clock-preview-controls { display: inline-flex; grid-template-columns: none; align-items: center; gap: .5rem; margin: 0 0 .5rem; color: #69736b; font-size: .78rem; font-weight: 650; }
 .clock-preview-controls[hidden] { display: none; }
 .clock-preview-controls select { padding: .35rem .55rem; border: 1px solid #aeb9af; border-radius: .4rem; background: #fff; font: inherit; }
-.clock-face { display: block; width: min(100%, 31rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
+.clock-face { display: block; width: min(100%, 38rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
 .sundial-sky { stroke: none; }
 .day-mode .sundial-sky { fill: #fbf1d2; }
 .night-mode .sundial-sky { fill: #14273d; }
@@ -116,7 +116,7 @@ button:disabled { cursor: wait; opacity: .6; }
 .night-mode .hour-label { fill: #f1f6fa; stroke: #14273d; }
 .civil-arc { fill: none; stroke-width: 2; }
 .civil-tick { stroke-width: 2; }
-.civil-time-label { dominant-baseline: middle; text-anchor: middle; font-size: 12px; font-weight: 700; paint-order: stroke; stroke: #fffef9; stroke-width: 5px; stroke-linejoin: round; }
+.civil-time-label { dominant-baseline: middle; text-anchor: middle; font-size: 12px; font-weight: 700; }
 .day-mode .civil-arc, .day-mode .civil-tick { stroke: #87612a; }
 .day-mode .civil-time-label { fill: #523b1d; }
 .night-mode .civil-arc, .night-mode .civil-tick { stroke: #526b7c; }
@@ -129,8 +129,10 @@ button:disabled { cursor: wait; opacity: .6; }
 .night-mode .horizon-line { stroke: #a9c2d9; }
 .day-mode .clock-pin { fill: #d28a22; stroke: #fff7df; stroke-width: 3; }
 .night-mode .clock-pin { fill: #d9ebf8; stroke: #14273d; stroke-width: 3; }
-.ordinary-time { text-anchor: middle; fill: #17211b; font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.ordinary-time-bg { fill: #fffef9; stroke: #cbd5ca; stroke-width: 1; }
+.time-lens { fill: #fffef9; stroke-width: 3; filter: drop-shadow(1px 2px 3px rgb(35 54 42 / 18%)); }
+.day-mode .time-lens { stroke: #b67a24; }
+.night-mode .time-lens { stroke: #6d8ca4; }
+.ordinary-time { dominant-baseline: middle; text-anchor: middle; fill: #17211b; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .night-mode .ordinary-time { fill: #17211b; }
 .clock-readout { display: block; margin-top: .5rem; font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .clock-legend { display: flex; justify-content: center; gap: 1.5rem; margin-top: .75rem; color: #5c675f; font-size: .8rem; font-weight: 750; }

@@ -51,6 +51,9 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.horizon-line')).toHaveLength(1);
     expect(svg.querySelectorAll('.inner-dial')).toHaveLength(1);
     expect(svg.querySelectorAll('.civil-time-label')).toHaveLength(5);
+    expect(svg.querySelectorAll('.time-lens')).toHaveLength(1);
+    expect(svg.querySelectorAll('.ordinary-time')).toHaveLength(1);
+    expect(svg.getAttribute('viewBox')).toBe('0 0 600 375');
     expect(svg.querySelectorAll('.current')).toHaveLength(1);
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
   });
@@ -62,13 +65,15 @@ describe('Display semicircle', () => {
     expect(model.ordinaryTime).toBe(['05:15', '08:45', '12:15', '15:45', '19:15'][hour/3]);
   });
 
-  it('renders civil-time labels after the pointer so labels remain legible', () => {
+  it('renders the moving time lens after the pointer and civil labels', () => {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     renderClockFace(svg, createClockFacePreviewModel(schedule, new Date('2026-09-22T12:15:00'), 3));
     const children = [...svg.children];
     const pointerIndex = children.findIndex(({ classList }) => classList.contains('period-pointer'));
     const labelIndex = children.findIndex(({ classList }) => classList.contains('civil-time-label'));
-    expect(labelIndex).toBeGreaterThan(pointerIndex);
+    const lensIndex = children.findIndex(({ classList }) => classList.contains('time-lens'));
+    expect(lensIndex).toBeGreaterThan(pointerIndex);
+    expect(lensIndex).toBeGreaterThan(labelIndex);
   });
 
   it('lists all thirteen hour boundaries for the active period', () => {
