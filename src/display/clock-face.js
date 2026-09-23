@@ -63,6 +63,28 @@ export function createClockFaceModel(schedule, referenceTime = new Date()) {
   };
 }
 
+export function createClockFacePreviewModel(schedule, referenceTime, temporalHour) {
+  const liveModel = createClockFaceModel(schedule, referenceTime);
+  if (![0, 3, 6, 9, 12].includes(temporalHour)) {
+    throw new RangeError('temporalHour must be one of 0, 3, 6, 9, or 12.');
+  }
+  const fraction = temporalHour/HOURS_PER_PERIOD;
+  const previewTime = timeAtFraction(liveModel.start, liveModel.end, fraction);
+  return {
+    ...liveModel,
+    fraction,
+    pointerAngle: START_ANGLE+fraction*SWEEP_ANGLE,
+    referenceTime: previewTime,
+    ordinaryTime: formatClockTime(previewTime),
+    segments: liveModel.segments.map((segment, index) => ({
+      ...segment,
+      isCurrent: temporalHour === HOURS_PER_PERIOD
+        ? index === HOURS_PER_PERIOD-1
+        : fraction >= index/HOURS_PER_PERIOD && fraction < (index+1)/HOURS_PER_PERIOD,
+    })),
+  };
+}
+
 export function createTemporalHourTable(schedule, referenceTime = new Date()) {
   const model = createClockFaceModel(schedule, referenceTime);
   const currentHour = Math.min(HOURS_PER_PERIOD-1, Math.floor(model.fraction*HOURS_PER_PERIOD));
@@ -135,27 +157,32 @@ export function renderClockFace(svg, model) {
     const end = polarPoint(225, angle);
     svg.append(svgElement('line', { x1: start.x, y1: start.y, x2: end.x, y2: end.y, class: 'hour-ray' }));
     const labelPoint = polarPoint(218, angle);
+    if (boundary === 0 || boundary === HOURS_PER_PERIOD) labelPoint.y -= 12;
     const label = svgElement('text', { x: labelPoint.x, y: labelPoint.y, class: 'hour-label' });
     label.textContent = String(boundary);
     svg.append(label);
   }
 
   svg.append(svgElement('path', { d: arcPath(145, START_ANGLE, END_ANGLE), class: 'civil-arc' }));
+  const civilLabels = [];
   for (const tick of model.civilTicks) {
     const inner = polarPoint(135, tick.angle);
     const outer = polarPoint(153, tick.angle);
     svg.append(svgElement('line', { x1: inner.x, y1: inner.y, x2: outer.x, y2: outer.y, class: 'civil-tick' }));
     const labelPoint = polarPoint(119, tick.angle);
+    if (tick.fraction === 0 || tick.fraction === 1) labelPoint.y -= 6;
     const label = svgElement('text', { x: labelPoint.x, y: labelPoint.y, class: 'civil-time-label' });
     label.textContent = tick.label;
-    svg.append(label);
+    civilLabels.push(label);
   }
 
+  svg.append(svgElement('line', { x1: 18, y1: CENTER_Y, x2: 482, y2: CENTER_Y, class: 'horizon-line' }));
   const pointerEnd = polarPoint(218, model.pointerAngle);
   svg.append(svgElement('line', { x1: CENTER_X, y1: CENTER_Y, x2: pointerEnd.x, y2: pointerEnd.y, class: 'period-pointer' }));
-  svg.append(svgElement('line', { x1: 18, y1: CENTER_Y, x2: 482, y2: CENTER_Y, class: 'horizon-line' }));
+  svg.append(...civilLabels);
   svg.append(svgElement('circle', { cx: CENTER_X, cy: CENTER_Y, r: 10, class: 'clock-pin' }));
-  const ordinaryTime = svgElement('text', { x: CENTER_X, y: 305, class: 'ordinary-time' });
+  svg.append(svgElement('rect', { x: 207, y: 281, width: 86, height: 31, rx: 15.5, class: 'ordinary-time-bg' }));
+  const ordinaryTime = svgElement('text', { x: CENTER_X, y: 303, class: 'ordinary-time' });
   ordinaryTime.textContent = model.ordinaryTime;
   svg.append(ordinaryTime);
 }

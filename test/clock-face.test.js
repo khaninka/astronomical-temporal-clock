@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from 'vitest';
-import { createClockFaceModel, createTemporalHourTable, renderClockFace } from '../src/display/clock-face.js';
+import { createClockFaceModel, createClockFacePreviewModel, createTemporalHourTable, renderClockFace } from '../src/display/clock-face.js';
 
 const found = (iso) => ({ state: 'FOUND', time: new Date(iso) });
 const schedule = {
@@ -55,6 +55,22 @@ describe('Display semicircle', () => {
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
   });
 
+  it.each([0, 3, 6, 9, 12])('previews the pointer exactly at astronomical hour %i', (hour) => {
+    const model = createClockFacePreviewModel(schedule, new Date('2026-09-22T12:15:00'), hour);
+    expect(model.fraction).toBe(hour/12);
+    expect(model.pointerAngle).toBe(-90+hour/12*180);
+    expect(model.ordinaryTime).toBe(['05:15', '08:45', '12:15', '15:45', '19:15'][hour/3]);
+  });
+
+  it('renders civil-time labels after the pointer so labels remain legible', () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    renderClockFace(svg, createClockFacePreviewModel(schedule, new Date('2026-09-22T12:15:00'), 3));
+    const children = [...svg.children];
+    const pointerIndex = children.findIndex(({ classList }) => classList.contains('period-pointer'));
+    const labelIndex = children.findIndex(({ classList }) => classList.contains('civil-time-label'));
+    expect(labelIndex).toBeGreaterThan(pointerIndex);
+  });
+
   it('lists all thirteen hour boundaries for the active period', () => {
     const table = createTemporalHourTable(schedule, new Date('2026-09-22T12:15:00'));
     expect(table.period).toBe('DAY');
@@ -65,4 +81,5 @@ describe('Display semicircle', () => {
     expect(table.rows.filter(({ isCurrent }) => isCurrent)).toHaveLength(1);
     expect(table.rows.find(({ isCurrent }) => isCurrent).hour).toBe(6);
   });
+
 });

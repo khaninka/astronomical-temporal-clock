@@ -2,7 +2,7 @@ import { createGoogleMapsUrl, createLocationData, formatLocalDate, formatLocalDa
 import { calculateLocationBoundaries } from './astronomy/boundary-rule.js';
 import { createCrossingDisplayModel } from './astronomy/crossing-display.js';
 import { calculateLocationTemporalClock, calculateTemporalClock, formatTemporalTime } from './astronomy/temporal-clock.js';
-import { createClockFaceModel, createTemporalHourTable, renderClockFace } from './display/clock-face.js';
+import { createClockFaceModel, createClockFacePreviewModel, createTemporalHourTable, renderClockFace } from './display/clock-face.js';
 
 const form = document.querySelector('#location-form');
 const latitudeInput = document.querySelector('#latitude');
@@ -43,6 +43,8 @@ const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const clockReadout = document.querySelector('#clock-readout');
 const clockMode = document.querySelector('#clock-mode');
+const clockPreviewControls = document.querySelector('#clock-preview-controls');
+const clockPreviewHour = document.querySelector('#clock-preview-hour');
 const hourTableView = document.querySelector('#hour-table-view');
 const hourTableContext = document.querySelector('#hour-table-context');
 const hourTableBody = document.querySelector('#hour-table-body');
@@ -68,6 +70,9 @@ let displaySchedule = null;
 let displayReferenceTime = null;
 let displayIsLive = false;
 let savedLocation = null;
+let previewTemporalHour = null;
+
+if (import.meta.env.DEV && clockPreviewControls) clockPreviewControls.hidden = false;
 
 function selectTab(name) {
   if (tabs[name].disabled) return;
@@ -138,9 +143,16 @@ function renderTemporalClock(now = new Date()) {
     current: displaySchedule.current,
     next: displaySchedule.next,
   });
-  renderClockFace(clockSvg, createClockFaceModel(displaySchedule, clockTime));
-  clockReadout.textContent = `${displayResult.period} ${formatTemporalTime(displayResult)}`;
-  clockMode.textContent = displayIsLive ? 'Live · device local time' : `Selected-date preview · ${formatLocalDate(clockTime)} at 12:00`;
+  const clockModel = previewTemporalHour === null
+    ? createClockFaceModel(displaySchedule, clockTime)
+    : createClockFacePreviewModel(displaySchedule, clockTime, previewTemporalHour);
+  renderClockFace(clockSvg, clockModel);
+  clockReadout.textContent = previewTemporalHour === null
+    ? `${displayResult.period} ${formatTemporalTime(displayResult)}`
+    : `Diagnostic preview · ${clockModel.period} ${String(previewTemporalHour).padStart(2, '0')}:00`;
+  clockMode.textContent = previewTemporalHour === null
+    ? (displayIsLive ? 'Live · device local time' : `Selected-date preview · ${formatLocalDate(clockTime)} at 12:00`)
+    : `Pointer overlap check · astronomical hour ${previewTemporalHour}`;
   const table = createTemporalHourTable(displaySchedule, clockTime);
   hourTableContext.textContent = `${table.period} · ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {
@@ -157,6 +169,11 @@ function renderTemporalClock(now = new Date()) {
     return tr;
   }));
 }
+
+clockPreviewHour?.addEventListener('change', () => {
+  previewTemporalHour = clockPreviewHour.value === 'live' ? null : Number(clockPreviewHour.value);
+  renderTemporalClock(new Date());
+});
 
 function renderCrossing(element, utcElement, crossing) {
   element.textContent = crossing.localTime;

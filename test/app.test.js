@@ -42,7 +42,12 @@ const formMarkup = `
     <span id="temporal-interval"></span><span id="temporal-hour-duration"></span>
   </section>
   <section id="clock-display" hidden>
-    <p id="clock-mode"></p><svg id="clock-face"></svg><output id="clock-readout"></output>
+    <p id="clock-mode"></p>
+    <label id="clock-preview-controls" hidden><select id="clock-preview-hour">
+      <option value="live">Live</option><option value="0">0</option><option value="3">3</option>
+      <option value="6">6</option><option value="9">9</option><option value="12">12</option>
+    </select></label>
+    <svg id="clock-face"></svg><output id="clock-readout"></output>
   </section>
   <section id="hour-table-view" hidden>
     <p id="hour-table-context"></p><table><tbody id="hour-table-body"></tbody></table>
@@ -212,6 +217,25 @@ describe('Location browser integration', () => {
     document.querySelector('#tab-boundary').click();
     expect(document.querySelector('#crossing-results').hidden).toBe(false);
     expect(document.querySelector('#crossing-date').textContent).not.toBe('');
+  });
+
+  it('previews pointer overlap positions and returns to live mode', async () => {
+    vi.setSystemTime(new Date(2026, 8, 22, 12, 15, 0));
+    await import('../src/app.js');
+    document.querySelector('#latitude').value = '31.8';
+    document.querySelector('#longitude').value = '35.2';
+    document.querySelector('#elevation').value = '800';
+    document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+    const selector = document.querySelector('#clock-preview-hour');
+    selector.value = '3';
+    selector.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(document.querySelector('#clock-mode').textContent).toContain('astronomical hour 3');
+    expect(document.querySelector('#clock-readout').textContent).toContain('03:00');
+
+    selector.value = 'live';
+    selector.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(document.querySelector('#clock-mode').textContent).toContain('Live');
   });
 
   it('fills editable fields from browser geolocation', async () => {

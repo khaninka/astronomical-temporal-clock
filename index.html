@@ -68,6 +68,17 @@
 
       <section id="clock-display" class="tab-panel clock-display" role="tabpanel" aria-labelledby="tab-clock" hidden>
         <p id="clock-mode" class="clock-mode"></p>
+        <label id="clock-preview-controls" class="clock-preview-controls" hidden>
+          Preview pointer position
+          <select id="clock-preview-hour">
+            <option value="live">Live</option>
+            <option value="0">0</option>
+            <option value="3">3</option>
+            <option value="6">6</option>
+            <option value="9">9</option>
+            <option value="12">12</option>
+          </select>
+        </label>
         <svg id="clock-face" class="clock-face"></svg>
         <output id="clock-readout" class="clock-readout" aria-live="off"></output>
         <div class="clock-legend" aria-hidden="true"><span class="day-key">DAY</span><span class="night-key">NIGHT</span></div>
