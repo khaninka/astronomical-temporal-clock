@@ -37,11 +37,13 @@ const temporalResults = document.querySelector('#temporal-results');
 const temporalPeriod = document.querySelector('#temporal-period');
 const temporalTime = document.querySelector('#temporal-time');
 const temporalInterval = document.querySelector('#temporal-interval');
+const temporalPeriodDuration = document.querySelector('#temporal-period-duration');
 const temporalHourDuration = document.querySelector('#temporal-hour-duration');
 const temporalContext = document.querySelector('#temporal-context');
 const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const clockReadout = document.querySelector('#clock-readout');
+const periodIndicator = document.querySelector('#period-indicator');
 const hourTableView = document.querySelector('#hour-table-view');
 const hourTableContext = document.querySelector('#hour-table-context');
 const hourTableBody = document.querySelector('#hour-table-body');
@@ -154,6 +156,7 @@ function renderTemporalClock(now = new Date()) {
     temporalPeriod.textContent = result.period;
     temporalTime.textContent = formatTemporalTime(result);
     temporalInterval.textContent = `${formatLocalDateTime(result.periodStart)} → ${formatLocalDateTime(result.periodEnd)}`;
+    temporalPeriodDuration.textContent = `${((result.periodEnd-result.periodStart)/60_000).toFixed(6)} ordinary minutes`;
     temporalHourDuration.textContent = `${(result.temporalHourDurationMilliseconds/60_000).toFixed(6)} ordinary minutes`;
     temporalContext.textContent = temporalIsLive
       ? 'Live result for the current device date'
@@ -171,7 +174,12 @@ function renderTemporalClock(now = new Date()) {
   });
   const clockModel = createClockFaceModel(displaySchedule, clockTime);
   renderClockFace(clockSvg, clockModel);
-  clockReadout.textContent = `${displayResult.period} ${formatTemporalTime(displayResult)}`;
+  if (periodIndicator.textContent !== displayResult.period) {
+    periodIndicator.textContent = displayResult.period;
+    periodIndicator.classList.toggle('day', displayResult.period === 'DAY');
+    periodIndicator.classList.toggle('night', displayResult.period === 'NIGHT');
+  }
+  clockReadout.textContent = `Astronomical time ${formatTemporalTime(displayResult)}`;
   const table = createDayHourTable(displaySchedule, clockTime);
   hourTableContext.textContent = `${formatLocalDate(table.start)} · DAY ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {

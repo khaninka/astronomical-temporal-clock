@@ -1,4 +1,4 @@
-# Astronomical Temporal Clock
+# Astronomical Hours
 
 A browser-only astronomical temporal clock, built with JavaScript ES Modules, HTML, CSS, Vite, and Vitest. There is no framework and no backend.
 
@@ -37,7 +37,7 @@ The M2 calculation core now provides:
 - an explicit `NO_CROSSING` result for polar/no-event intervals;
 - canonical NREL regression tests and Astronomy Engine as a development-only oracle.
 
-M1 through M5 are complete for the local v1 prototype. Five accessible tabs switch between `Location`, `Clock`, `BoundaryRule`, `TemporalClock`, and `Hours`. A first visit opens Location; after valid data is saved, the live clock opens automatically for the tab session. The clock shows the active DAY or NIGHT period as twelve astronomical sectors between boundary labels `0…12` on a semicircle. The Hours tab lists the twelve daytime astronomical hours with their ordinary local start and end times. At astronomical night (`Tzeit hakochavim l’chumra`) the table switches once to the following calendar date; civil midnight does not change it.
+M1 through M5 are complete for the local v1 prototype. Five accessible tabs use the approved English labels `Settings`, `Clock`, `Day boundaries`, `Time calculation`, and `Day hours`. A first visit opens Settings; after valid location data is saved, the live clock opens automatically for the tab session. The clock shows the active DAY or NIGHT period as twelve astronomical sectors between boundary labels `0…12` on a semicircle. Time calculation explains the active period, its boundaries and duration, the duration of one astronomical hour, and the resulting astronomical time. The Day hours tab lists the twelve daytime astronomical hours with their ordinary local start and end times. At astronomical night (`צאת הכוכבים לחומרא`, stringent nightfall) the table switches once to the following calendar date; civil midnight does not change it.
 
 The live schedule is refreshed when the device's local date changes and whenever the page resumes after sleep or returns from the background. DAY/NIGHT transitions therefore do not require a page reload.
 

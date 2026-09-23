@@ -81,6 +81,7 @@ button:disabled { cursor: wait; opacity: .6; }
 .map-link { color: #315b3f; font-weight: 700; }
 .map-link[hidden] { display: none; }
 .source-note { margin: -.35rem 0 0; color: #5c675f; font-size: .85rem; }
+.elevation-source { margin-top: -.75rem; }
 .crossing-results { padding: 1.25rem; border: 1px solid #cbd5ca; border-radius: .75rem; background: #f5f7f1; }
 .crossing-results[hidden] { display: none; }
 .crossing-results h2 { margin: 0; font-size: 1.25rem; }
@@ -96,6 +97,9 @@ button:disabled { cursor: wait; opacity: .6; }
 .clock-display { margin: 1.5rem 0 0; padding: 1.25rem; border: 0; border-radius: .75rem; background: transparent; text-align: center; }
 .clock-display[hidden] { display: none; }
 .clock-display h2 { margin: 0; font-size: 1.25rem; }
+.period-indicator { display: inline-block; min-width: 5rem; padding: .35rem .8rem; border-radius: 999px; font-size: .82rem; font-weight: 800; letter-spacing: .08em; }
+.period-indicator.day { color: #5d4018; background: #fbf1d2; border: 1px solid #d8b66f; }
+.period-indicator.night { color: #f1f6fa; background: #203753; border: 1px solid #526b7c; }
 .clock-face { display: block; width: min(100%, 38rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
 .sundial-sky { stroke: none; }
 .day-mode .sundial-sky { fill: #fbf1d2; }
@@ -131,10 +135,6 @@ button:disabled { cursor: wait; opacity: .6; }
 .ordinary-time { dominant-baseline: middle; text-anchor: middle; fill: #17211b; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .night-mode .ordinary-time { fill: #17211b; }
 .clock-readout { display: block; margin-top: .5rem; font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-.clock-legend { display: flex; justify-content: center; gap: 1.5rem; margin-top: .75rem; color: #5c675f; font-size: .8rem; font-weight: 750; }
-.clock-legend span::before { content: ''; display: inline-block; width: .8em; height: .8em; margin-right: .4em; border-radius: 50%; }
-.day-key::before { background: #e8b954; }
-.night-key::before { background: #203753; }
 .hour-table-view h2 { margin: 0; }
 .hour-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .hour-table th, .hour-table td { padding: .7rem .8rem; border-bottom: 1px solid #dce2da; text-align: left; }

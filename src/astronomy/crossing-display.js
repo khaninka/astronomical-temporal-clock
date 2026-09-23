@@ -33,9 +33,9 @@ export function createCrossingDisplayModel(calculation, referenceTime = new Date
     ? compareTimeToShkiah(referenceTime, calculation.shkiah)
     : null;
   const comparisonText = {
-    BEFORE_SHKIAH: 'Current device time is before shkiah.',
-    AT_OR_AFTER_SHKIAH: 'Current device time is at or after shkiah; the new evening cycle has begun.',
-    NO_SHKIAH: 'Shkiah does not occur on this date.',
+    BEFORE_SHKIAH: 'Current device time is before visible sunset.',
+    AT_OR_AFTER_SHKIAH: 'Current device time is at or after visible sunset; the new evening cycle has begun.',
+    NO_SHKIAH: 'Visible sunset does not occur on this date.',
   }[comparison] ?? null;
   return {
     date: formatLocalDate(calculation.localDateTime),
@@ -43,8 +43,8 @@ export function createCrossingDisplayModel(calculation, referenceTime = new Date
     horizonDip: `${calculation.horizonDip.toFixed(6)}°`,
     morningTargetAltitude: `${calculation.morningTargetAltitude.toFixed(6)}°`,
     eveningTargetAltitude: `${calculation.eveningTargetAltitude.toFixed(6)}°`,
-    netz: displayCrossing(calculation.netz, 'Netz'),
-    shkiah: displayCrossing(calculation.shkiah, 'Shkiah'),
+    netz: displayCrossing(calculation.netz, 'Visible sunrise'),
+    shkiah: displayCrossing(calculation.shkiah, 'Visible sunset'),
     dayStart: displayCrossing(calculation.dayStart, 'DAY start'),
     dayEnd: displayCrossing(calculation.dayEnd, 'DAY end'),
     liveComparison: comparisonText,

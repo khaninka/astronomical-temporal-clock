@@ -36,8 +36,8 @@ describe('SunCrossing display model', () => {
       dayStart: { state: 'NO_CROSSING', time: null },
       dayEnd: { state: 'NO_CROSSING', time: null },
     }, new Date(2026, 5, 22));
-    expect(model.netz).toEqual({ state: 'NO_CROSSING', localTime: 'No netz crossing on this date', utcTime: null });
-    expect(model.shkiah).toEqual({ state: 'NO_CROSSING', localTime: 'No shkiah crossing on this date', utcTime: null });
+    expect(model.netz).toEqual({ state: 'NO_CROSSING', localTime: 'No visible sunrise crossing on this date', utcTime: null });
+    expect(model.shkiah).toEqual({ state: 'NO_CROSSING', localTime: 'No visible sunset crossing on this date', utcTime: null });
   });
 
   it('compares device time with shkiah only for the selected current date', () => {
@@ -52,7 +52,7 @@ describe('SunCrossing display model', () => {
       dayEnd: { state: 'FOUND', time: new Date(2026, 3, 19, 19, 51) },
     };
     expect(createCrossingDisplayModel(calculation, new Date(2026, 3, 19, 19, 14)).liveComparison)
-      .toContain('before shkiah');
+      .toContain('before visible sunset');
     expect(createCrossingDisplayModel(calculation, new Date(2026, 3, 19, 19, 15)).liveComparison)
       .toContain('new evening cycle');
     expect(createCrossingDisplayModel(calculation, new Date(2026, 3, 20, 1)).liveComparison).toBeNull();

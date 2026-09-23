@@ -14,12 +14,13 @@ const formMarkup = `
     <form id="location-form">
       <input id="latitude" name="latitude">
       <input id="longitude" name="longitude">
-      <input id="elevation" name="elevation">
-      <input id="calculation-date" name="localDateTime" type="date">
       <button id="use-location" type="button">Use my location</button>
-      <button id="get-elevation" type="button">Get terrain elevation</button>
+      <label><input id="elevation" name="elevation"><button id="get-elevation" type="button">Get terrain elevation</button></label>
       <p id="elevation-source" hidden></p>
-      <button id="use-device-date" type="button">Use device date</button>
+      <div class="test-controls">
+        <input id="calculation-date" name="localDateTime" type="date">
+        <button id="use-device-date" type="button">Use device date</button>
+      </div>
       <button id="revert-location" type="button" hidden disabled>Revert changes</button>
       <button id="location-next" type="submit">Next</button>
     </form>
@@ -39,10 +40,10 @@ const formMarkup = `
   <section id="temporal-results" hidden>
     <p id="temporal-context"></p>
     <span id="temporal-period"></span><span id="temporal-time"></span>
-    <span id="temporal-interval"></span><span id="temporal-hour-duration"></span>
+    <span id="temporal-interval"></span><span id="temporal-period-duration"></span><span id="temporal-hour-duration"></span>
   </section>
   <section id="clock-display" hidden>
-    <svg id="clock-face"></svg><output id="clock-readout"></output>
+    <output id="period-indicator"></output><svg id="clock-face"></svg><output id="clock-readout"></output>
   </section>
   <section id="hour-table-view" hidden>
     <p id="hour-table-context"></p><table><tbody id="hour-table-body"></tbody></table>
@@ -106,6 +107,8 @@ describe('Location browser integration', () => {
     expect(document.querySelector('#elevation-source').textContent).toContain('Open-Meteo');
     expect(document.querySelector('#elevation-source').textContent).toContain('Copernicus DEM GLO-90');
     expect(document.querySelector('#elevation-source').hidden).toBe(false);
+    expect(document.querySelector('#elevation-source').previousElementSibling.querySelector('#elevation')).not.toBeNull();
+    expect(document.querySelector('#elevation-source').nextElementSibling.classList).toContain('test-controls');
   });
 
   it('validates, normalizes, and displays a manually entered location', async () => {
@@ -194,6 +197,8 @@ describe('Location browser integration', () => {
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
     expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
+    expect(document.querySelector('#temporal-period-duration').textContent).toMatch(/^\d+\.\d{6} ordinary minutes$/);
+    expect(document.querySelector('#temporal-hour-duration').textContent).toMatch(/^\d+\.\d{6} ordinary minutes$/);
     const initial = document.querySelector('#temporal-time').textContent;
     expect(initial).toMatch(/^\d{2}:\d{2}:\d{2}\.\d{3}$/);
 
@@ -228,15 +233,16 @@ describe('Location browser integration', () => {
     document.querySelector('#longitude').value = String(observer.longitude);
     document.querySelector('#elevation').value = String(observer.elevation);
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    expect(document.querySelector('#clock-readout').textContent).toContain('DAY');
+    expect(document.querySelector('#period-indicator').textContent).toBe('DAY');
+    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical time');
 
     vi.setSystemTime(afterDayEnd);
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(document.querySelector('#clock-readout').textContent).toContain('NIGHT');
+    expect(document.querySelector('#period-indicator').textContent).toBe('NIGHT');
 
     vi.setSystemTime(afterNextDayStart);
     window.dispatchEvent(new Event('pageshow'));
-    expect(document.querySelector('#clock-readout').textContent).toContain('DAY');
+    expect(document.querySelector('#period-indicator').textContent).toBe('DAY');
     expect(document.querySelector('#hour-table-context').textContent).not.toBe('');
   });
 

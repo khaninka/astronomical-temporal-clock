@@ -3,23 +3,23 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Astronomical temporal clock">
-    <title>Astronomical Temporal Clock</title>
+    <meta name="description" content="Astronomical hours clock">
+    <title>Astronomical Hours</title>
     <link rel="stylesheet" href="/src/styles.css">
   </head>
   <body>
     <main class="panel">
-      <header class="app-header"><h1>Astronomical Temporal Clock</h1></header>
+      <header class="app-header"><h1>Astronomical Hours</h1></header>
       <nav class="tab-list" role="tablist" aria-label="Clock sections">
-        <button id="tab-location" role="tab" aria-selected="true" aria-controls="view-location" type="button">Location</button>
+        <button id="tab-location" role="tab" aria-selected="true" aria-controls="view-location" type="button">Settings</button>
         <button id="tab-clock" role="tab" aria-selected="false" aria-controls="clock-display" type="button" disabled>Clock</button>
-        <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>BoundaryRule</button>
-        <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>TemporalClock</button>
-        <button id="tab-hours" role="tab" aria-selected="false" aria-controls="hour-table-view" type="button" disabled>Hours</button>
+        <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>Day boundaries</button>
+        <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>Time calculation</button>
+        <button id="tab-hours" role="tab" aria-selected="false" aria-controls="hour-table-view" type="button" disabled>Day hours</button>
       </nav>
 
       <section id="view-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
-        <h2>Location</h2>
+        <h2>Settings</h2>
         <p class="intro">Set the observation point used by the clock.</p>
         <form id="location-form" novalidate>
           <div class="coordinate-grid">
@@ -45,11 +45,12 @@
               <button id="get-elevation" type="button">Get terrain elevation</button>
             </span>
           </label>
+          <p id="elevation-source" class="source-note elevation-source" hidden></p>
           <details class="test-controls">
             <summary>Diagnostic test date</summary>
             <label>Calculation date
               <input id="calculation-date" name="localDateTime" type="date" required>
-              <span class="hint">Used by BoundaryRule and TemporalClock tests only. The clock always uses today's device date.</span>
+              <span class="hint">Used by Day boundaries and Time calculation diagnostics only. The clock always uses today's device date.</span>
             </label>
             <button id="use-device-date" type="button">Use device date</button>
             <section class="device-time" aria-labelledby="device-time-heading">
@@ -57,7 +58,6 @@
               <time id="local-date-time"></time>
             </section>
           </details>
-          <p id="elevation-source" class="source-note" hidden></p>
           <div class="form-actions">
             <button id="revert-location" type="button" hidden disabled>Revert changes</button>
             <button id="location-next" type="submit" class="primary">Next</button>
@@ -67,37 +67,38 @@
       </section>
 
       <section id="clock-display" class="tab-panel clock-display" role="tabpanel" aria-labelledby="tab-clock" hidden>
+        <output id="period-indicator" class="period-indicator" aria-live="polite"></output>
         <svg id="clock-face" class="clock-face"></svg>
         <output id="clock-readout" class="clock-readout" aria-live="off"></output>
-        <div class="clock-legend" aria-hidden="true"><span class="day-key">DAY</span><span class="night-key">NIGHT</span></div>
       </section>
 
       <section id="crossing-results" class="tab-panel crossing-results" role="tabpanel" aria-labelledby="tab-boundary" hidden>
-        <h2>BoundaryRule</h2>
+        <h2>Day boundaries</h2>
         <p class="result-context"><span id="crossing-date"></span><span aria-hidden="true"> · </span><span id="crossing-reference"></span><span aria-hidden="true"> · </span>Ideal horizon dip <span id="horizon-dip"></span></p>
         <dl>
-          <div><dt>Netz anchor · <span id="rising-target"></span></dt><dd id="rising-local"></dd><dd id="rising-utc" class="utc-time"></dd></div>
-          <div><dt>DAY starts · Alot hashachar · netz −72 min</dt><dd id="day-start-local"></dd><dd id="day-start-utc" class="utc-time"></dd></div>
-          <div><dt>Shkiah anchor · <span id="setting-target"></span></dt><dd id="setting-local"></dd><dd id="setting-utc" class="utc-time"></dd></div>
-          <div><dt>DAY ends · Tzeit hakochavim l'chumra · shkiah +36 min</dt><dd id="day-end-local"></dd><dd id="day-end-utc" class="utc-time"></dd></div>
+          <div><dt><span lang="he" dir="rtl">נץ החמה הנראה</span> · visible sunrise · <span id="rising-target"></span></dt><dd id="rising-local"></dd><dd id="rising-utc" class="utc-time"></dd></div>
+          <div><dt>DAY starts · <span lang="he" dir="rtl">עלות השחר</span> · sunrise −72 min</dt><dd id="day-start-local"></dd><dd id="day-start-utc" class="utc-time"></dd></div>
+          <div><dt><span lang="he" dir="rtl">שקיעת החמה</span> · visible sunset · <span id="setting-target"></span></dt><dd id="setting-local"></dd><dd id="setting-utc" class="utc-time"></dd></div>
+          <div><dt>DAY ends · <span lang="he" dir="rtl">צאת הכוכבים לחומרא</span> · stringent nightfall · sunset +36 min</dt><dd id="day-end-local"></dd><dd id="day-end-utc" class="utc-time"></dd></div>
         </dl>
         <p id="cycle-status" class="cycle-status" hidden></p>
-        <p class="source-note">Shkiah uses elevation and an ideal unobstructed horizon. Surrounding terrain and buildings are not modelled.</p>
+        <p class="source-note"><span lang="he" dir="rtl">שקיעת החמה</span> (visible sunset) uses elevation and an ideal unobstructed horizon. Surrounding terrain and buildings are not modelled.</p>
       </section>
 
       <section id="temporal-results" class="tab-panel crossing-results temporal-results" role="tabpanel" aria-labelledby="tab-temporal" hidden>
-        <h2>TemporalClock</h2>
+        <h2>Time calculation</h2>
         <p id="temporal-context" class="result-context"></p>
         <dl>
           <div><dt>Period</dt><dd id="temporal-period"></dd></div>
-          <div><dt>Temporal time</dt><dd id="temporal-time" class="temporal-time"></dd></div>
-          <div><dt>Real interval</dt><dd id="temporal-interval"></dd></div>
-          <div><dt>One temporal hour</dt><dd id="temporal-hour-duration"></dd></div>
+          <div><dt>Period boundaries</dt><dd id="temporal-interval"></dd></div>
+          <div><dt>Period duration</dt><dd id="temporal-period-duration"></dd></div>
+          <div><dt>Astronomical hour duration</dt><dd id="temporal-hour-duration"></dd></div>
+          <div><dt>Astronomical time</dt><dd id="temporal-time" class="temporal-time"></dd></div>
         </dl>
       </section>
 
       <section id="hour-table-view" class="tab-panel hour-table-view" role="tabpanel" aria-labelledby="tab-hours" hidden>
-        <h2>DAY astronomical hours</h2>
+        <h2>Day hours</h2>
         <p id="hour-table-context" class="result-context"></p>
         <table class="hour-table">
           <thead><tr><th scope="col">Hour</th><th scope="col">Starts</th><th scope="col">Ends</th></tr></thead>
