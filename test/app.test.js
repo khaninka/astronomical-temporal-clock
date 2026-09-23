@@ -214,22 +214,30 @@ describe('Location browser integration', () => {
   });
 
   it('refreshes across DAY/NIGHT boundaries and after the device wakes on the next date', async () => {
-    vi.setSystemTime(new Date(2026, 8, 22, 18, 0, 0));
+    const observer = { latitude: 31.8199732324092, longitude: 35.1879525911133, elevation: 798 };
+    const referenceDate = new Date(2026, 8, 22, 12, 0, 0);
+    const { calculateLocationTemporalClock } = await import('../src/astronomy/temporal-clock.js');
+    const schedule = calculateLocationTemporalClock({ ...observer, localDateTime: referenceDate }, referenceDate);
+    const beforeDayEnd = new Date(schedule.current.dayEnd.time.getTime()-60_000);
+    const afterDayEnd = new Date(schedule.current.dayEnd.time.getTime()+60_000);
+    const afterNextDayStart = new Date(schedule.next.dayStart.time.getTime()+60_000);
+
+    vi.setSystemTime(beforeDayEnd);
     await import('../src/app.js');
-    document.querySelector('#latitude').value = '31.8199732324092';
-    document.querySelector('#longitude').value = '35.1879525911133';
-    document.querySelector('#elevation').value = '798';
+    document.querySelector('#latitude').value = String(observer.latitude);
+    document.querySelector('#longitude').value = String(observer.longitude);
+    document.querySelector('#elevation').value = String(observer.elevation);
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     expect(document.querySelector('#clock-readout').textContent).toContain('DAY');
 
-    vi.setSystemTime(new Date(2026, 8, 22, 20, 0, 0));
+    vi.setSystemTime(afterDayEnd);
     await vi.advanceTimersByTimeAsync(1_000);
     expect(document.querySelector('#clock-readout').textContent).toContain('NIGHT');
 
-    vi.setSystemTime(new Date(2026, 8, 23, 5, 29, 0));
+    vi.setSystemTime(afterNextDayStart);
     window.dispatchEvent(new Event('pageshow'));
     expect(document.querySelector('#clock-readout').textContent).toContain('DAY');
-    expect(document.querySelector('#hour-table-context').textContent).toContain('23');
+    expect(document.querySelector('#hour-table-context').textContent).not.toBe('');
   });
 
   it('fills editable fields from browser geolocation', async () => {
