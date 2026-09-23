@@ -133,5 +133,11 @@ button:disabled { cursor: wait; opacity: .6; }
 .clock-legend span::before { content: ''; display: inline-block; width: .8em; height: .8em; margin-right: .4em; border-radius: 50%; }
 .day-key::before { background: #e8b954; }
 .night-key::before { background: #203753; }
+.hour-table-view h2 { margin: 0; }
+.hour-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hour-table th, .hour-table td { padding: .7rem .8rem; border-bottom: 1px solid #dce2da; text-align: left; }
+.hour-table thead th { color: #5c675f; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.hour-table tbody th { color: #315b3f; }
+.hour-table .current-hour-row { background: #eaf2e9; box-shadow: inset .25rem 0 #315b3f; }
 @media (prefers-reduced-motion: reduce) { .temporal-sector { transition: none; } }
 @media (max-width: 36rem) { .coordinate-grid, .elevation-row { grid-template-columns: 1fr; } .coordinate-actions { align-items: stretch; flex-direction: column; } .form-actions { flex-direction: column-reverse; } }

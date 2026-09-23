@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from 'vitest';
-import { createClockFaceModel, renderClockFace } from '../src/display/clock-face.js';
+import { createClockFaceModel, createTemporalHourTable, renderClockFace } from '../src/display/clock-face.js';
 
 const found = (iso) => ({ state: 'FOUND', time: new Date(iso) });
 const schedule = {
@@ -53,5 +53,16 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.civil-time-label')).toHaveLength(5);
     expect(svg.querySelectorAll('.current')).toHaveLength(1);
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
+  });
+
+  it('lists all thirteen hour boundaries for the active period', () => {
+    const table = createTemporalHourTable(schedule, new Date('2026-09-22T12:15:00'));
+    expect(table.period).toBe('DAY');
+    expect(table.rows).toHaveLength(13);
+    expect(table.rows[0].time).toEqual(schedule.current.dayStart.time);
+    expect(table.rows[12].time).toEqual(schedule.current.dayEnd.time);
+    expect(table.rows[12].isPeriodEnd).toBe(true);
+    expect(table.rows.filter(({ isCurrent }) => isCurrent)).toHaveLength(1);
+    expect(table.rows.find(({ isCurrent }) => isCurrent).hour).toBe(6);
   });
 });

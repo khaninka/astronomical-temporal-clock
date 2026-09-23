@@ -2,7 +2,7 @@ import { createGoogleMapsUrl, createLocationData, formatLocalDate, formatLocalDa
 import { calculateLocationBoundaries } from './astronomy/boundary-rule.js';
 import { createCrossingDisplayModel } from './astronomy/crossing-display.js';
 import { calculateLocationTemporalClock, calculateTemporalClock, formatTemporalTime } from './astronomy/temporal-clock.js';
-import { createClockFaceModel, renderClockFace } from './display/clock-face.js';
+import { createClockFaceModel, createTemporalHourTable, renderClockFace } from './display/clock-face.js';
 
 const form = document.querySelector('#location-form');
 const latitudeInput = document.querySelector('#latitude');
@@ -43,17 +43,22 @@ const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const clockReadout = document.querySelector('#clock-readout');
 const clockMode = document.querySelector('#clock-mode');
+const hourTableView = document.querySelector('#hour-table-view');
+const hourTableContext = document.querySelector('#hour-table-context');
+const hourTableBody = document.querySelector('#hour-table-body');
 const tabs = {
   location: document.querySelector('#tab-location'),
   clock: document.querySelector('#tab-clock'),
   boundary: document.querySelector('#tab-boundary'),
   temporal: document.querySelector('#tab-temporal'),
+  hours: document.querySelector('#tab-hours'),
 };
 const views = {
   location: document.querySelector('#view-location'),
   clock: clockDisplay,
   boundary: crossingResults,
   temporal: temporalResults,
+  hours: hourTableView,
 };
 const LOCATION_STORAGE_KEY = 'astronomical-temporal-clock.location.v1';
 let temporalSchedule = null;
@@ -136,6 +141,21 @@ function renderTemporalClock(now = new Date()) {
   renderClockFace(clockSvg, createClockFaceModel(displaySchedule, clockTime));
   clockReadout.textContent = `${displayResult.period} ${formatTemporalTime(displayResult)}`;
   clockMode.textContent = displayIsLive ? 'Live · device local time' : `Selected-date preview · ${formatLocalDate(clockTime)} at 12:00`;
+  const table = createTemporalHourTable(displaySchedule, clockTime);
+  hourTableContext.textContent = `${table.period} · ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
+  hourTableBody.replaceChildren(...table.rows.map((row) => {
+    const tr = document.createElement('tr');
+    if (row.isCurrent) tr.className = 'current-hour-row';
+    const astronomical = document.createElement('th');
+    astronomical.scope = 'row';
+    astronomical.textContent = row.isPeriodEnd ? '12 · period end' : String(row.hour);
+    const ordinary = document.createElement('td');
+    ordinary.textContent = new Intl.DateTimeFormat(undefined, {
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+    }).format(row.time);
+    tr.append(astronomical, ordinary);
+    return tr;
+  }));
 }
 
 function renderCrossing(element, utcElement, crossing) {
@@ -222,6 +242,7 @@ function calculateFromForm(targetTab = 'clock') {
     tabs.clock.disabled = displaySchedule === null;
     tabs.boundary.disabled = false;
     tabs.temporal.disabled = temporalSchedule === null;
+    tabs.hours.disabled = displaySchedule === null;
     const persisted = saveLocation(liveLocation);
     statusElement.textContent = persisted
       ? 'Saved for this browser session.'

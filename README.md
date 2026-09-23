@@ -37,7 +37,7 @@ The M2 calculation core now provides:
 - an explicit `NO_CROSSING` result for polar/no-event intervals;
 - canonical NREL regression tests and Astronomy Engine as a development-only oracle.
 
-M1 through M5 are complete for the local v1 prototype. Four accessible tabs switch between `Location`, `Astronomical Temporal Clock`, `BoundaryRule`, and `TemporalClock`. A first visit opens Location; after valid data is saved, the live clock opens automatically and later visits restore it. The clock shows the active DAY or NIGHT period as twelve astronomical sectors between boundary labels `0…12` on a semicircle. A shared pointer synchronizes those sectors with an always-light inner ordinary-time scale.
+M1 through M5 are complete for the local v1 prototype. Five accessible tabs switch between `Location`, `Clock`, `BoundaryRule`, `TemporalClock`, and `Hours`. A first visit opens Location; after valid data is saved, the live clock opens automatically for the tab session. The clock shows the active DAY or NIGHT period as twelve astronomical sectors between boundary labels `0…12` on a semicircle. The Hours tab lists ordinary-time boundaries `0…12` for the active DAY or NIGHT period.
 
 If the browser does not provide a reliable altitude, elevation remains empty. The user can enter it manually or explicitly request estimated terrain elevation. Validated latitude, longitude, and elevation are saved only in the current tab session (`sessionStorage`). The live clock always uses the current device-local date. An editable date remains under **Diagnostic test date** and affects only BoundaryRule and diagnostic TemporalClock output.
 

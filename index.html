@@ -12,9 +12,10 @@
       <header class="app-header"><h1>Astronomical Temporal Clock</h1></header>
       <nav class="tab-list" role="tablist" aria-label="Clock sections">
         <button id="tab-location" role="tab" aria-selected="true" aria-controls="view-location" type="button">Location</button>
-        <button id="tab-clock" role="tab" aria-selected="false" aria-controls="clock-display" type="button" disabled>Astronomical Temporal Clock</button>
+        <button id="tab-clock" role="tab" aria-selected="false" aria-controls="clock-display" type="button" disabled>Clock</button>
         <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>BoundaryRule</button>
         <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>TemporalClock</button>
+        <button id="tab-hours" role="tab" aria-selected="false" aria-controls="hour-table-view" type="button" disabled>Hours</button>
       </nav>
 
       <section id="view-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
@@ -94,6 +95,15 @@
           <div><dt>Real interval</dt><dd id="temporal-interval"></dd></div>
           <div><dt>One temporal hour</dt><dd id="temporal-hour-duration"></dd></div>
         </dl>
+      </section>
+
+      <section id="hour-table-view" class="tab-panel hour-table-view" role="tabpanel" aria-labelledby="tab-hours" hidden>
+        <h2>Astronomical hour starts</h2>
+        <p id="hour-table-context" class="result-context"></p>
+        <table class="hour-table">
+          <thead><tr><th scope="col">Astronomical time</th><th scope="col">Ordinary local time</th></tr></thead>
+          <tbody id="hour-table-body"></tbody>
+        </table>
       </section>
     </main>
     <script type="module" src="/src/app.js"></script>

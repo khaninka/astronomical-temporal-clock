@@ -8,6 +8,7 @@ const formMarkup = `
     <button id="tab-clock" aria-selected="false" disabled>Clock</button>
     <button id="tab-boundary" aria-selected="false" disabled>Boundary</button>
     <button id="tab-temporal" aria-selected="false" disabled>Temporal</button>
+    <button id="tab-hours" aria-selected="false" disabled>Hours</button>
   </nav>
   <section id="view-location">
     <form id="location-form">
@@ -42,6 +43,9 @@ const formMarkup = `
   </section>
   <section id="clock-display" hidden>
     <p id="clock-mode"></p><svg id="clock-face"></svg><output id="clock-readout"></output>
+  </section>
+  <section id="hour-table-view" hidden>
+    <p id="hour-table-context"></p><table><tbody id="hour-table-body"></tbody></table>
   </section>
 `;
 
@@ -183,6 +187,10 @@ describe('Location browser integration', () => {
 
     expect(document.querySelector('#clock-display').hidden).toBe(false);
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
+    document.querySelector('#tab-hours').click();
+    expect(document.querySelector('#hour-table-view').hidden).toBe(false);
+    expect(document.querySelectorAll('#hour-table-body tr')).toHaveLength(13);
+    document.querySelector('#tab-clock').click();
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
     expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
