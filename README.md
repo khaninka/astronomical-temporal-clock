@@ -54,6 +54,10 @@ npm run dev
 
 Open the local URL printed by Vite. Browser geolocation is available in a secure context; `localhost` is treated as secure by modern browsers.
 
+## GitHub Pages
+
+The production build uses the repository base path `/astronomical-temporal-clock/`. Pushes to `main` run the tests, build `dist`, and deploy that directory through `.github/workflows/deploy-pages.yml`. In the repository settings, select **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
 ## Test
 
 ```sh
