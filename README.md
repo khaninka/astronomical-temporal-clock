@@ -41,6 +41,10 @@ M1 through M5 are complete for the local v1 prototype. Five accessible tabs use 
 
 The live schedule is refreshed when the device's local date changes and whenever the page resumes after sleep or returns from the background. DAY/NIGHT transitions therefore do not require a page reload.
 
+### Boundary model scope
+
+This branch intentionally implements the Israel fixed-minute boundary model: `עלות השחר` is visible sunrise minus 72 ordinary minutes, and `צאת הכוכבים לחומרא` is visible sunset plus 36 ordinary minutes. These offsets do not adapt twilight duration to latitude and must not be presented as a universal high-latitude twilight model. Any future latitude-aware global model belongs in a separate development branch.
+
 If the browser does not provide a reliable altitude, elevation remains empty. The user can enter it manually or explicitly request estimated terrain elevation. Validated latitude, longitude, and elevation are saved only in the current tab session (`sessionStorage`). The live clock always uses the current device-local date. An editable date remains under **Diagnostic test date** and affects only BoundaryRule and diagnostic TemporalClock output.
 
 ## Run locally

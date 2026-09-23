@@ -12,6 +12,8 @@ The first implementation is a static browser application. It uses JavaScript ES 
 
 `Location → SunCrossing → BoundaryRule → TemporalClock → Display`
 
+The current branch is explicitly scoped to the Israel fixed-minute boundary model. It applies `עלות השחר = visible sunrise −72 ordinary minutes` and `צאת הכוכבים לחומרא = visible sunset +36 ordinary minutes`. It does not reinterpret these offsets as latitude-aware astronomical twilight. A future global angular model, if pursued, must be developed separately.
+
 Each module has one responsibility and later modules must not be folded into earlier ones.
 
 An independent Test/Reference layer may compare results with authoritative external astronomical data, but it is not part of the runtime pipeline.
