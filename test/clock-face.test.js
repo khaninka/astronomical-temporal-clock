@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it } from 'vitest';
-import { createClockFaceModel, createClockFacePreviewModel, createTemporalHourTable, renderClockFace } from '../src/display/clock-face.js';
+import { createClockFaceModel, createClockFacePreviewModel, createDayHourTable, createTemporalHourTable, renderClockFace } from '../src/display/clock-face.js';
 
 const found = (iso) => ({ state: 'FOUND', time: new Date(iso) });
 const schedule = {
@@ -85,6 +85,24 @@ describe('Display semicircle', () => {
     expect(table.rows[12].isPeriodEnd).toBe(true);
     expect(table.rows.filter(({ isCurrent }) => isCurrent)).toHaveLength(1);
     expect(table.rows.find(({ isCurrent }) => isCurrent).hour).toBe(6);
+  });
+
+  it('keeps the current date DAY table before astronomical night', () => {
+    const table = createDayHourTable(schedule, new Date('2026-09-22T18:00:00'));
+    expect(table.start).toEqual(schedule.current.dayStart.time);
+    expect(table.end).toEqual(schedule.current.dayEnd.time);
+    expect(table.rows).toHaveLength(12);
+    expect(table.rows[0]).toMatchObject({ hour: 1, start: schedule.current.dayStart.time });
+    expect(table.rows[11]).toMatchObject({ hour: 12, end: schedule.current.dayEnd.time });
+  });
+
+  it('switches the DAY table to the next date at astronomical night', () => {
+    const before = createDayHourTable(schedule, new Date('2026-09-22T19:14:59'));
+    const after = createDayHourTable(schedule, new Date('2026-09-22T19:15:00'));
+    expect(before.start).toEqual(schedule.current.dayStart.time);
+    expect(after.start).toEqual(schedule.next.dayStart.time);
+    expect(after.end).toEqual(schedule.next.dayEnd.time);
+    expect(after.rows.every(({ isCurrent }) => !isCurrent)).toBe(true);
   });
 
 });

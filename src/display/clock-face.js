@@ -106,6 +106,31 @@ export function createTemporalHourTable(schedule, referenceTime = new Date()) {
   };
 }
 
+export function createDayHourTable(schedule, referenceTime = new Date()) {
+  requireDate(referenceTime, 'referenceTime');
+  const currentEnd = requireBoundary(schedule?.current?.dayEnd, 'current.dayEnd');
+  const day = referenceTime < currentEnd ? schedule.current : schedule.next;
+  const start = requireBoundary(day?.dayStart, 'displayedDay.dayStart');
+  const end = requireBoundary(day?.dayEnd, 'displayedDay.dayEnd');
+  const duration = end-start;
+  if (duration <= 0) throw new RangeError('Displayed DAY boundaries must be strictly increasing.');
+  return {
+    period: 'DAY',
+    start,
+    end,
+    rows: Array.from({ length: HOURS_PER_PERIOD }, (_, index) => {
+      const rowStart = timeAtFraction(start, end, index/HOURS_PER_PERIOD);
+      const rowEnd = timeAtFraction(start, end, (index+1)/HOURS_PER_PERIOD);
+      return {
+        hour: index+1,
+        start: rowStart,
+        end: rowEnd,
+        isCurrent: referenceTime >= rowStart && referenceTime < rowEnd,
+      };
+    }),
+  };
+}
+
 function polarPoint(radius, angle) {
   const radians = (angle-90)*Math.PI/180;
   return { x: CENTER_X+radius*Math.cos(radians), y: CENTER_Y+radius*Math.sin(radians) };

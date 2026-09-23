@@ -2,7 +2,7 @@ import { createGoogleMapsUrl, createLocationData, formatLocalDate, formatLocalDa
 import { calculateLocationBoundaries } from './astronomy/boundary-rule.js';
 import { createCrossingDisplayModel } from './astronomy/crossing-display.js';
 import { calculateLocationTemporalClock, calculateTemporalClock, formatTemporalTime } from './astronomy/temporal-clock.js';
-import { createClockFaceModel, createClockFacePreviewModel, createTemporalHourTable, renderClockFace } from './display/clock-face.js';
+import { createClockFaceModel, createDayHourTable, renderClockFace } from './display/clock-face.js';
 
 const form = document.querySelector('#location-form');
 const latitudeInput = document.querySelector('#latitude');
@@ -42,9 +42,6 @@ const temporalContext = document.querySelector('#temporal-context');
 const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const clockReadout = document.querySelector('#clock-readout');
-const clockMode = document.querySelector('#clock-mode');
-const clockPreviewControls = document.querySelector('#clock-preview-controls');
-const clockPreviewHour = document.querySelector('#clock-preview-hour');
 const hourTableView = document.querySelector('#hour-table-view');
 const hourTableContext = document.querySelector('#hour-table-context');
 const hourTableBody = document.querySelector('#hour-table-body');
@@ -70,9 +67,8 @@ let displaySchedule = null;
 let displayReferenceTime = null;
 let displayIsLive = false;
 let savedLocation = null;
-let previewTemporalHour = null;
-
-if (import.meta.env.DEV && clockPreviewControls) clockPreviewControls.hidden = false;
+let liveLocation = null;
+let displayScheduleDate = null;
 
 function selectTab(name) {
   if (tabs[name].disabled) return;
@@ -116,7 +112,37 @@ function sameLocalDate(a, b) {
     && a.getDate() === b.getDate();
 }
 
+function localDateKey(date) {
+  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+}
+
+function refreshLiveSchedule(now, force = false) {
+  if (!liveLocation) return false;
+  const dateKey = localDateKey(now);
+  if (!force && displaySchedule && displayScheduleDate === dateKey) return false;
+  const locationForToday = createLocationData({
+    ...liveLocation,
+    localDateTime: formatLocalDateInput(now),
+  });
+  const liveTemporal = calculateLocationTemporalClock(locationForToday, now);
+  displaySchedule = liveTemporal.state === 'AVAILABLE' ? liveTemporal : null;
+  displayScheduleDate = dateKey;
+  tabs.clock.disabled = displaySchedule === null;
+  tabs.hours.disabled = displaySchedule === null;
+  return true;
+}
+
 function renderTemporalClock(now = new Date()) {
+  if (temporalIsLive && displayReferenceTime && !sameLocalDate(displayReferenceTime, now)) {
+    temporalIsLive = false;
+    temporalReferenceTime = new Date(
+      displayReferenceTime.getFullYear(),
+      displayReferenceTime.getMonth(),
+      displayReferenceTime.getDate(),
+      12,
+    );
+  }
+  refreshLiveSchedule(now);
   if (temporalSchedule) {
     const referenceTime = temporalIsLive ? now : temporalReferenceTime;
     const result = calculateTemporalClock({
@@ -143,37 +169,28 @@ function renderTemporalClock(now = new Date()) {
     current: displaySchedule.current,
     next: displaySchedule.next,
   });
-  const clockModel = previewTemporalHour === null
-    ? createClockFaceModel(displaySchedule, clockTime)
-    : createClockFacePreviewModel(displaySchedule, clockTime, previewTemporalHour);
+  const clockModel = createClockFaceModel(displaySchedule, clockTime);
   renderClockFace(clockSvg, clockModel);
-  clockReadout.textContent = previewTemporalHour === null
-    ? `${displayResult.period} ${formatTemporalTime(displayResult)}`
-    : `Diagnostic preview · ${clockModel.period} ${String(previewTemporalHour).padStart(2, '0')}:00`;
-  clockMode.textContent = previewTemporalHour === null
-    ? (displayIsLive ? 'Live · device local time' : `Selected-date preview · ${formatLocalDate(clockTime)} at 12:00`)
-    : `Pointer overlap check · astronomical hour ${previewTemporalHour}`;
-  const table = createTemporalHourTable(displaySchedule, clockTime);
-  hourTableContext.textContent = `${table.period} · ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
+  clockReadout.textContent = `${displayResult.period} ${formatTemporalTime(displayResult)}`;
+  const table = createDayHourTable(displaySchedule, clockTime);
+  hourTableContext.textContent = `${formatLocalDate(table.start)} · DAY ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {
     const tr = document.createElement('tr');
     if (row.isCurrent) tr.className = 'current-hour-row';
     const astronomical = document.createElement('th');
     astronomical.scope = 'row';
-    astronomical.textContent = row.isPeriodEnd ? '12 · period end' : String(row.hour);
-    const ordinary = document.createElement('td');
-    ordinary.textContent = new Intl.DateTimeFormat(undefined, {
+    astronomical.textContent = String(row.hour);
+    const start = document.createElement('td');
+    const end = document.createElement('td');
+    const timeFormatter = new Intl.DateTimeFormat(undefined, {
       hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
-    }).format(row.time);
-    tr.append(astronomical, ordinary);
+    });
+    start.textContent = timeFormatter.format(row.start);
+    end.textContent = timeFormatter.format(row.end);
+    tr.append(astronomical, start, end);
     return tr;
   }));
 }
-
-clockPreviewHour?.addEventListener('change', () => {
-  previewTemporalHour = clockPreviewHour.value === 'live' ? null : Number(clockPreviewHour.value);
-  renderTemporalClock(new Date());
-});
 
 function renderCrossing(element, utcElement, crossing) {
   element.textContent = crossing.localTime;
@@ -249,22 +266,28 @@ function calculateFromForm(targetTab = 'clock') {
       ? now
       : new Date(diagnosticLocation.localDateTime.getFullYear(), diagnosticLocation.localDateTime.getMonth(), diagnosticLocation.localDateTime.getDate(), 12);
     const diagnosticTemporal = calculateLocationTemporalClock(diagnosticLocation, temporalReferenceTime);
-    const liveLocation = createLocationData({ ...values, localDateTime: formatLocalDateInput(now) });
+    const confirmedLiveLocation = createLocationData({ ...values, localDateTime: formatLocalDateInput(now) });
+    liveLocation = {
+      latitude: confirmedLiveLocation.latitude,
+      longitude: confirmedLiveLocation.longitude,
+      elevation: confirmedLiveLocation.elevation,
+    };
     displayIsLive = true;
     displayReferenceTime = now;
-    const liveTemporal = calculateLocationTemporalClock(liveLocation, now);
+    const liveTemporal = calculateLocationTemporalClock(confirmedLiveLocation, now);
     displaySchedule = liveTemporal.state === 'AVAILABLE' ? liveTemporal : null;
+    displayScheduleDate = localDateKey(now);
     temporalSchedule = diagnosticTemporal?.state === 'AVAILABLE' ? diagnosticTemporal : null;
     renderTemporalClock(now);
     tabs.clock.disabled = displaySchedule === null;
     tabs.boundary.disabled = false;
     tabs.temporal.disabled = temporalSchedule === null;
     tabs.hours.disabled = displaySchedule === null;
-    const persisted = saveLocation(liveLocation);
+    const persisted = saveLocation(confirmedLiveLocation);
     statusElement.textContent = persisted
       ? 'Saved for this browser session.'
-      : `Location confirmed for this session: ${liveLocation.latitude}, ${liveLocation.longitude}, ${liveLocation.elevation} m. Browser storage was unavailable.`;
-    showMapLink(liveLocation);
+      : `Location confirmed for this session: ${confirmedLiveLocation.latitude}, ${confirmedLiveLocation.longitude}, ${confirmedLiveLocation.elevation} m. Browser storage was unavailable.`;
+    showMapLink(confirmedLiveLocation);
     primaryLocationButton.textContent = 'Done';
     revertLocationButton.hidden = false;
     revertLocationButton.disabled = true;
@@ -381,3 +404,16 @@ setInterval(() => {
   renderDeviceTime(now);
   renderTemporalClock(now);
 }, 1_000);
+
+function resumeLiveClock() {
+  if (!liveLocation) return;
+  const now = new Date();
+  refreshLiveSchedule(now, true);
+  renderDeviceTime(now);
+  renderTemporalClock(now);
+}
+
+window.addEventListener('pageshow', resumeLiveClock);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') resumeLiveClock();
+});

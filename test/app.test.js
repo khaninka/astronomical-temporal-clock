@@ -42,11 +42,6 @@ const formMarkup = `
     <span id="temporal-interval"></span><span id="temporal-hour-duration"></span>
   </section>
   <section id="clock-display" hidden>
-    <p id="clock-mode"></p>
-    <label id="clock-preview-controls" hidden><select id="clock-preview-hour">
-      <option value="live">Live</option><option value="0">0</option><option value="3">3</option>
-      <option value="6">6</option><option value="9">9</option><option value="12">12</option>
-    </select></label>
     <svg id="clock-face"></svg><output id="clock-readout"></output>
   </section>
   <section id="hour-table-view" hidden>
@@ -194,7 +189,7 @@ describe('Location browser integration', () => {
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
     document.querySelector('#tab-hours').click();
     expect(document.querySelector('#hour-table-view').hidden).toBe(false);
-    expect(document.querySelectorAll('#hour-table-body tr')).toHaveLength(13);
+    expect(document.querySelectorAll('#hour-table-body tr')).toHaveLength(12);
     document.querySelector('#tab-clock').click();
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
@@ -209,7 +204,6 @@ describe('Location browser integration', () => {
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     expect(document.querySelector('#temporal-results').hidden).toBe(true);
     expect(document.querySelector('#clock-display').hidden).toBe(false);
-    expect(document.querySelector('#clock-mode').textContent).toContain('Live');
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
@@ -219,23 +213,23 @@ describe('Location browser integration', () => {
     expect(document.querySelector('#crossing-date').textContent).not.toBe('');
   });
 
-  it('previews pointer overlap positions and returns to live mode', async () => {
-    vi.setSystemTime(new Date(2026, 8, 22, 12, 15, 0));
+  it('refreshes across DAY/NIGHT boundaries and after the device wakes on the next date', async () => {
+    vi.setSystemTime(new Date(2026, 8, 22, 18, 0, 0));
     await import('../src/app.js');
-    document.querySelector('#latitude').value = '31.8';
-    document.querySelector('#longitude').value = '35.2';
-    document.querySelector('#elevation').value = '800';
+    document.querySelector('#latitude').value = '31.8199732324092';
+    document.querySelector('#longitude').value = '35.1879525911133';
+    document.querySelector('#elevation').value = '798';
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    expect(document.querySelector('#clock-readout').textContent).toContain('DAY');
 
-    const selector = document.querySelector('#clock-preview-hour');
-    selector.value = '3';
-    selector.dispatchEvent(new Event('change', { bubbles: true }));
-    expect(document.querySelector('#clock-mode').textContent).toContain('astronomical hour 3');
-    expect(document.querySelector('#clock-readout').textContent).toContain('03:00');
+    vi.setSystemTime(new Date(2026, 8, 22, 20, 0, 0));
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(document.querySelector('#clock-readout').textContent).toContain('NIGHT');
 
-    selector.value = 'live';
-    selector.dispatchEvent(new Event('change', { bubbles: true }));
-    expect(document.querySelector('#clock-mode').textContent).toContain('Live');
+    vi.setSystemTime(new Date(2026, 8, 23, 5, 29, 0));
+    window.dispatchEvent(new Event('pageshow'));
+    expect(document.querySelector('#clock-readout').textContent).toContain('DAY');
+    expect(document.querySelector('#hour-table-context').textContent).toContain('23');
   });
 
   it('fills editable fields from browser geolocation', async () => {
