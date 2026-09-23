@@ -43,7 +43,6 @@ const temporalContext = document.querySelector('#temporal-context');
 const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const clockReadout = document.querySelector('#clock-readout');
-const periodIndicator = document.querySelector('#period-indicator');
 const hourTableView = document.querySelector('#hour-table-view');
 const hourTableContext = document.querySelector('#hour-table-context');
 const hourTableBody = document.querySelector('#hour-table-body');
@@ -174,12 +173,7 @@ function renderTemporalClock(now = new Date()) {
   });
   const clockModel = createClockFaceModel(displaySchedule, clockTime);
   renderClockFace(clockSvg, clockModel);
-  if (periodIndicator.textContent !== displayResult.period) {
-    periodIndicator.textContent = displayResult.period;
-    periodIndicator.classList.toggle('day', displayResult.period === 'DAY');
-    periodIndicator.classList.toggle('night', displayResult.period === 'NIGHT');
-  }
-  clockReadout.textContent = `Astronomical time ${formatTemporalTime(displayResult)}`;
+  clockReadout.textContent = `Astronomical ${displayResult.period} time — ${formatTemporalTime(displayResult)}`;
   const table = createDayHourTable(displaySchedule, clockTime);
   hourTableContext.textContent = `${formatLocalDate(table.start)} · DAY ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {

@@ -97,9 +97,6 @@ button:disabled { cursor: wait; opacity: .6; }
 .clock-display { margin: 1.5rem 0 0; padding: 1.25rem; border: 0; border-radius: .75rem; background: transparent; text-align: center; }
 .clock-display[hidden] { display: none; }
 .clock-display h2 { margin: 0; font-size: 1.25rem; }
-.period-indicator { display: inline-block; min-width: 5rem; padding: .35rem .8rem; border-radius: 999px; font-size: .82rem; font-weight: 800; letter-spacing: .08em; }
-.period-indicator.day { color: #5d4018; background: #fbf1d2; border: 1px solid #d8b66f; }
-.period-indicator.night { color: #f1f6fa; background: #203753; border: 1px solid #526b7c; }
 .clock-face { display: block; width: min(100%, 38rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
 .sundial-sky { stroke: none; }
 .day-mode .sundial-sky { fill: #fbf1d2; }

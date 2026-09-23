@@ -43,7 +43,7 @@ const formMarkup = `
     <span id="temporal-interval"></span><span id="temporal-period-duration"></span><span id="temporal-hour-duration"></span>
   </section>
   <section id="clock-display" hidden>
-    <output id="period-indicator"></output><svg id="clock-face"></svg><output id="clock-readout"></output>
+    <svg id="clock-face"></svg><output id="clock-readout"></output>
   </section>
   <section id="hour-table-view" hidden>
     <p id="hour-table-context"></p><table><tbody id="hour-table-body"></tbody></table>
@@ -233,16 +233,15 @@ describe('Location browser integration', () => {
     document.querySelector('#longitude').value = String(observer.longitude);
     document.querySelector('#elevation').value = String(observer.elevation);
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    expect(document.querySelector('#period-indicator').textContent).toBe('DAY');
-    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical time');
+    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical DAY time —');
 
     vi.setSystemTime(afterDayEnd);
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(document.querySelector('#period-indicator').textContent).toBe('NIGHT');
+    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical NIGHT time —');
 
     vi.setSystemTime(afterNextDayStart);
     window.dispatchEvent(new Event('pageshow'));
-    expect(document.querySelector('#period-indicator').textContent).toBe('DAY');
+    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical DAY time —');
     expect(document.querySelector('#hour-table-context').textContent).not.toBe('');
   });
 
