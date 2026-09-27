@@ -234,14 +234,22 @@ describe('Location browser integration', () => {
     document.querySelector('#elevation').value = String(observer.elevation);
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical DAY time —');
+    expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
+    const dayBoundaryDate = document.querySelector('#crossing-date').textContent;
 
     vi.setSystemTime(afterDayEnd);
     await vi.advanceTimersByTimeAsync(1_000);
     expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical NIGHT time —');
+    expect(document.querySelector('#temporal-period').textContent).toBe('NIGHT');
+    expect(document.querySelector('#crossing-date').textContent).not.toBe(dayBoundaryDate);
+    const nightBoundaryDate = document.querySelector('#crossing-date').textContent;
 
     vi.setSystemTime(afterNextDayStart);
     window.dispatchEvent(new Event('pageshow'));
     expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical DAY time —');
+    expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
+    expect(document.querySelector('#temporal-context').textContent).toContain('Live result');
+    expect(document.querySelector('#crossing-date').textContent).toBe(nightBoundaryDate);
     expect(document.querySelector('#hour-table-context').textContent).not.toBe('');
   });
 

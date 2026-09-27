@@ -64,6 +64,7 @@ const LOCATION_STORAGE_KEY = 'astronomical-temporal-clock.location.v1';
 let temporalSchedule = null;
 let temporalReferenceTime = null;
 let temporalIsLive = false;
+let boundaryIsLive = false;
 let displaySchedule = null;
 let displayReferenceTime = null;
 let displayIsLive = false;
@@ -127,6 +128,11 @@ function refreshLiveSchedule(now, force = false) {
   });
   const liveTemporal = calculateLocationTemporalClock(locationForToday, now);
   displaySchedule = liveTemporal.state === 'AVAILABLE' ? liveTemporal : null;
+  if (temporalIsLive) {
+    temporalSchedule = displaySchedule;
+    temporalReferenceTime = now;
+    tabs.temporal.disabled = temporalSchedule === null;
+  }
   displayScheduleDate = dateKey;
   tabs.clock.disabled = displaySchedule === null;
   tabs.hours.disabled = displaySchedule === null;
@@ -134,15 +140,6 @@ function refreshLiveSchedule(now, force = false) {
 }
 
 function renderTemporalClock(now = new Date()) {
-  if (temporalIsLive && displayReferenceTime && !sameLocalDate(displayReferenceTime, now)) {
-    temporalIsLive = false;
-    temporalReferenceTime = new Date(
-      displayReferenceTime.getFullYear(),
-      displayReferenceTime.getMonth(),
-      displayReferenceTime.getDate(),
-      12,
-    );
-  }
   refreshLiveSchedule(now);
   if (temporalSchedule) {
     const referenceTime = temporalIsLive ? now : temporalReferenceTime;
@@ -175,6 +172,12 @@ function renderTemporalClock(now = new Date()) {
   renderClockFace(clockSvg, clockModel);
   clockReadout.textContent = `Astronomical ${displayResult.period} time — ${formatTemporalTime(displayResult)}`;
   const table = createDayHourTable(displaySchedule, clockTime);
+  if (boundaryIsLive) {
+    const displayedBoundaries = clockTime < displaySchedule.current.dayEnd.time
+      ? displaySchedule.current
+      : displaySchedule.next;
+    renderCrossings(displayedBoundaries);
+  }
   hourTableContext.textContent = `${formatLocalDate(table.start)} · DAY ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {
     const tr = document.createElement('tr');
@@ -263,6 +266,7 @@ function calculateFromForm(targetTab = 'clock') {
     const crossings = calculateLocationBoundaries(diagnosticLocation);
     renderCrossings(crossings);
     const now = new Date();
+    boundaryIsLive = sameLocalDate(diagnosticLocation.localDateTime, now);
     temporalIsLive = sameLocalDate(diagnosticLocation.localDateTime, now);
     temporalReferenceTime = temporalIsLive
       ? now
