@@ -205,6 +205,22 @@ export function renderClockFace(svg, model) {
         'data-solar-hour': tick.hour,
       }));
     }
+    const solarLabels = [
+      { angle: model.solarArc.startAngle, text: 'נץ החמה', edge: 'start' },
+      { angle: model.solarArc.endAngle, text: 'שקיעת החמה', edge: 'end' },
+    ];
+    for (const item of solarLabels) {
+      const point = polarPoint(SOLAR_ARC_RADIUS+12, item.angle);
+      const label = svgElement('text', {
+        x: point.x,
+        y: point.y,
+        class: `solar-hour-label solar-hour-label-${item.edge}`,
+        lang: 'he',
+        direction: 'rtl',
+      });
+      label.textContent = item.text;
+      svg.append(label);
+    }
   }
 
   for (const segment of model.segments) {

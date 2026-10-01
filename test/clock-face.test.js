@@ -57,6 +57,8 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.current')).toHaveLength(1);
     expect(svg.querySelectorAll('.solar-hours-arc')).toHaveLength(1);
     expect(svg.querySelectorAll('.solar-hour-tick')).toHaveLength(13);
+    expect([...svg.querySelectorAll('.solar-hour-label')].map(({ textContent }) => textContent))
+      .toEqual(['נץ החמה', 'שקיעת החמה']);
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
   });
 
@@ -65,6 +67,7 @@ describe('Display semicircle', () => {
     renderClockFace(svg, createClockFaceModel(schedule, new Date('2026-09-22T04:00:00')));
     expect(svg.querySelector('.solar-hours-arc')).toBeNull();
     expect(svg.querySelector('.solar-hour-tick')).toBeNull();
+    expect(svg.querySelector('.solar-hour-label')).toBeNull();
   });
 
   it.each([0, 3, 6, 9, 12])('previews the pointer exactly at astronomical hour %i', (hour) => {
