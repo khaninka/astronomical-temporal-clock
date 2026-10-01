@@ -91,6 +91,9 @@ button:disabled { cursor: wait; opacity: .6; }
 .crossing-results dt { color: #496a55; font-size: .85rem; font-weight: 700; }
 .crossing-results dd { margin: .25rem 0 0; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 .crossing-results .utc-time { color: #69736b; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; overflow-wrap: anywhere; }
+#crossing-results dl > div { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 1rem; align-items: baseline; }
+#crossing-results dt { grid-column: 1 / -1; }
+#crossing-results .utc-time { min-width: 0; text-align: left; white-space: nowrap; }
 .crossing-results .source-note { margin: 0; }
 .cycle-status { margin: 0 0 1rem; padding: .7rem; border-left: .25rem solid #315b3f; background: #eaf2e9; }
 .temporal-results .temporal-time { font-size: 1.6rem; font-weight: 750; letter-spacing: .04em; }
