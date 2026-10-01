@@ -5,9 +5,9 @@ import { createClockFaceModel, createClockFacePreviewModel, createDayHourTable, 
 
 const found = (iso) => ({ state: 'FOUND', time: new Date(iso) });
 const schedule = {
-  previous: { dayStart: found('2026-09-21T05:14:00'), dayEnd: found('2026-09-21T19:17:00') },
-  current: { dayStart: found('2026-09-22T05:15:00'), dayEnd: found('2026-09-22T19:15:00') },
-  next: { dayStart: found('2026-09-23T05:15:00'), dayEnd: found('2026-09-23T19:15:00') },
+  previous: { dayStart: found('2026-09-21T05:14:00'), dayEnd: found('2026-09-21T19:17:00'), netz: found('2026-09-21T06:26:00'), shkiah: found('2026-09-21T18:05:00') },
+  current: { dayStart: found('2026-09-22T05:15:00'), dayEnd: found('2026-09-22T19:15:00'), netz: found('2026-09-22T06:27:00'), shkiah: found('2026-09-22T18:03:00') },
+  next: { dayStart: found('2026-09-23T05:15:00'), dayEnd: found('2026-09-23T19:15:00'), netz: found('2026-09-23T06:27:00'), shkiah: found('2026-09-23T18:03:00') },
 };
 
 describe('Display semicircle', () => {
@@ -55,7 +55,16 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.ordinary-time')).toHaveLength(1);
     expect(svg.getAttribute('viewBox')).toBe('0 0 600 375');
     expect(svg.querySelectorAll('.current')).toHaveLength(1);
+    expect(svg.querySelectorAll('.solar-hours-arc')).toHaveLength(1);
+    expect(svg.querySelectorAll('.solar-hour-tick')).toHaveLength(13);
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
+  });
+
+  it('does not render the solar-hour arc during NIGHT', () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    renderClockFace(svg, createClockFaceModel(schedule, new Date('2026-09-22T04:00:00')));
+    expect(svg.querySelector('.solar-hours-arc')).toBeNull();
+    expect(svg.querySelector('.solar-hour-tick')).toBeNull();
   });
 
   it.each([0, 3, 6, 9, 12])('previews the pointer exactly at astronomical hour %i', (hour) => {

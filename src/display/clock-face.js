@@ -10,6 +10,7 @@ const INNER_RADIUS = 195;
 const CIVIL_ARC_RADIUS = 176;
 const CIVIL_LABEL_RADIUS = 150;
 const LENS_TRACK_RADIUS = 105;
+const SOLAR_ARC_RADIUS = 288;
 
 function requireDate(value, name) {
   if (!(value instanceof Date) || Number.isNaN(value.getTime())) throw new TypeError(`${name} must be a valid Date.`);
@@ -57,6 +58,26 @@ export function createClockFaceModel(schedule, referenceTime = new Date()) {
     const time = timeAtFraction(interval.start, interval.end, tickFraction);
     return { fraction: tickFraction, angle: START_ANGLE+tickFraction*SWEEP_ANGLE, time, label: formatClockTime(time) };
   });
+  let solarArc = null;
+  if (interval.period === 'DAY') {
+    const netz = requireBoundary(schedule.current?.netz, 'current.netz');
+    const shkiah = requireBoundary(schedule.current?.shkiah, 'current.shkiah');
+    const startFraction = (netz-interval.start)/duration;
+    const endFraction = (shkiah-interval.start)/duration;
+    if (startFraction < 0 || endFraction > 1 || endFraction <= startFraction) {
+      throw new RangeError('Solar-hour boundaries must be inside the DAY period.');
+    }
+    solarArc = {
+      start: netz,
+      end: shkiah,
+      startAngle: START_ANGLE+startFraction*SWEEP_ANGLE,
+      endAngle: START_ANGLE+endFraction*SWEEP_ANGLE,
+      ticks: Array.from({ length: HOURS_PER_PERIOD+1 }, (_, hour) => ({
+        hour,
+        angle: START_ANGLE+(startFraction+(endFraction-startFraction)*hour/HOURS_PER_PERIOD)*SWEEP_ANGLE,
+      })),
+    };
+  }
   return {
     ...interval,
     fraction,
@@ -65,6 +86,7 @@ export function createClockFaceModel(schedule, referenceTime = new Date()) {
     ordinaryTime: formatClockTime(referenceTime),
     segments,
     civilTicks,
+    solarArc,
   };
 }
 
@@ -165,6 +187,25 @@ export function renderClockFace(svg, model) {
 
   const sky = svgElement('path', { d: `${sectorPath(START_ANGLE, END_ANGLE)} Z`, class: 'sundial-sky' });
   svg.append(sky);
+
+  if (model.solarArc) {
+    svg.append(svgElement('path', {
+      d: arcPath(SOLAR_ARC_RADIUS, model.solarArc.startAngle, model.solarArc.endAngle),
+      class: 'solar-hours-arc',
+    }));
+    for (const tick of model.solarArc.ticks) {
+      const inner = polarPoint(SOLAR_ARC_RADIUS-6, tick.angle);
+      const outer = polarPoint(SOLAR_ARC_RADIUS+6, tick.angle);
+      svg.append(svgElement('line', {
+        x1: inner.x,
+        y1: inner.y,
+        x2: outer.x,
+        y2: outer.y,
+        class: 'solar-hour-tick',
+        'data-solar-hour': tick.hour,
+      }));
+    }
+  }
 
   for (const segment of model.segments) {
     const path = svgElement('path', {

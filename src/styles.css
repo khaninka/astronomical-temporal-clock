@@ -98,6 +98,8 @@ button:disabled { cursor: wait; opacity: .6; }
 .clock-display[hidden] { display: none; }
 .clock-display h2 { margin: 0; font-size: 1.25rem; }
 .clock-face { display: block; width: min(100%, 38rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
+.solar-hours-arc { fill: none; stroke: #9a6b25; stroke-width: 2.5; }
+.solar-hour-tick { stroke: #9a6b25; stroke-width: 2; stroke-linecap: round; }
 .sundial-sky { stroke: none; }
 .day-mode .sundial-sky { fill: #fbf1d2; }
 .night-mode .sundial-sky { fill: #14273d; }
