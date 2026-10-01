@@ -179,7 +179,7 @@ function svgElement(name, attributes = {}) {
 export function renderClockFace(svg, model) {
   if (!(svg instanceof SVGElement)) throw new TypeError('svg must be an SVG element.');
   svg.replaceChildren();
-  svg.setAttribute('viewBox', '0 0 600 375');
+  svg.setAttribute('viewBox', '-25 0 650 375');
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', `${model.period} temporal clock: twelve astronomical hours synchronized with ordinary time`);
   svg.classList.toggle('day-mode', model.period === 'DAY');
@@ -206,11 +206,11 @@ export function renderClockFace(svg, model) {
       }));
     }
     const solarLabels = [
-      { angle: model.solarArc.startAngle, text: 'נץ החמה', edge: 'start' },
-      { angle: model.solarArc.endAngle, text: 'שקיעת החמה', edge: 'end' },
+      { angle: model.solarArc.startAngle, text: 'נץ', edge: 'start' },
+      { angle: model.solarArc.endAngle, text: 'שקיה', edge: 'end' },
     ];
     for (const item of solarLabels) {
-      const point = polarPoint(SOLAR_ARC_RADIUS+12, item.angle);
+      const point = polarPoint(SOLAR_ARC_RADIUS+22, item.angle);
       const label = svgElement('text', {
         x: point.x,
         y: point.y,

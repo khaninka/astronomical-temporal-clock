@@ -53,12 +53,12 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.civil-time-label')).toHaveLength(5);
     expect(svg.querySelectorAll('.time-lens')).toHaveLength(1);
     expect(svg.querySelectorAll('.ordinary-time')).toHaveLength(1);
-    expect(svg.getAttribute('viewBox')).toBe('0 0 600 375');
+    expect(svg.getAttribute('viewBox')).toBe('-25 0 650 375');
     expect(svg.querySelectorAll('.current')).toHaveLength(1);
     expect(svg.querySelectorAll('.solar-hours-arc')).toHaveLength(1);
     expect(svg.querySelectorAll('.solar-hour-tick')).toHaveLength(13);
     expect([...svg.querySelectorAll('.solar-hour-label')].map(({ textContent }) => textContent))
-      .toEqual(['נץ החמה', 'שקיעת החמה']);
+      .toEqual(['נץ', 'שקיה']);
     expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
   });
 
