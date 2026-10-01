@@ -8,13 +8,13 @@ export class LocationValidationError extends Error {
 
 function parseRequiredNumber(value, field, errors) {
   if (value === '' || value === null || value === undefined) {
-    errors[field] = 'This field is required.';
+    errors[field] = 'זהו שדה חובה.';
     return null;
   }
 
   const number = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(number)) {
-    errors[field] = 'Enter a finite number.';
+    errors[field] = 'יש להזין מספר תקין.';
     return null;
   }
   return number;
@@ -27,13 +27,13 @@ export function validateLocation(input) {
   const elevation = parseRequiredNumber(input.elevation, 'elevation', errors);
 
   if (latitude !== null && (latitude < -90 || latitude > 90)) {
-    errors.latitude = 'Latitude must be between −90 and 90.';
+    errors.latitude = 'קו הרוחב חייב להיות בין ‎−90 ל־90.';
   }
   if (longitude !== null && (longitude < -180 || longitude > 180)) {
-    errors.longitude = 'Longitude must be between −180 and 180.';
+    errors.longitude = 'קו האורך חייב להיות בין ‎−180 ל־180.';
   }
   if (elevation !== null && (elevation < -500 || elevation > 10_000)) {
-    errors.elevation = 'Elevation must be between −500 and 10,000 metres.';
+    errors.elevation = 'גובה פני הים חייב להיות בין ‎−500 ל־10,000 מטרים.';
   }
 
   if (Object.keys(errors).length > 0) {
@@ -49,10 +49,10 @@ export function validateCoordinates(input) {
   const longitude = parseRequiredNumber(input.longitude, 'longitude', errors);
 
   if (latitude !== null && (latitude < -90 || latitude > 90)) {
-    errors.latitude = 'Latitude must be between −90 and 90.';
+    errors.latitude = 'קו הרוחב חייב להיות בין ‎−90 ל־90.';
   }
   if (longitude !== null && (longitude < -180 || longitude > 180)) {
-    errors.longitude = 'Longitude must be between −180 and 180.';
+    errors.longitude = 'קו האורך חייב להיות בין ‎−180 ל־180.';
   }
   if (Object.keys(errors).length > 0) {
     throw new LocationValidationError(errors);
@@ -109,7 +109,7 @@ export function createGoogleMapsUrl(input) {
 
 export async function getTerrainElevation(input, fetchImpl = globalThis.fetch) {
   const { latitude, longitude } = validateCoordinates(input);
-  if (typeof fetchImpl !== 'function') throw new Error('Terrain elevation lookup is unavailable.');
+  if (typeof fetchImpl !== 'function') throw new Error('שירות איתור גובה פני הים אינו זמין.');
 
   const url = new URL('https://api.open-meteo.com/v1/elevation');
   url.searchParams.set('latitude', latitude);
@@ -119,20 +119,20 @@ export async function getTerrainElevation(input, fetchImpl = globalThis.fetch) {
   try {
     response = await fetchImpl(url, { signal: AbortSignal.timeout(10_000) });
   } catch {
-    throw new Error('Could not reach the terrain elevation service.');
+    throw new Error('לא ניתן להתחבר לשירות גובה פני הים.');
   }
-  if (!response.ok) throw new Error('Terrain elevation service returned an error.');
+  if (!response.ok) throw new Error('שירות גובה פני הים החזיר שגיאה.');
 
   let payload;
   try {
     payload = await response.json();
   } catch {
-    throw new Error('Terrain elevation service returned an invalid response.');
+    throw new Error('שירות גובה פני הים החזיר תשובה לא תקינה.');
   }
 
   const elevation = payload?.elevation?.[0];
   if (!Number.isFinite(elevation)) {
-    throw new Error('No terrain elevation is available for these coordinates.');
+    throw new Error('אין נתון גובה פני ים לקואורדינטות האלה.');
   }
 
   return {
@@ -144,7 +144,7 @@ export async function getTerrainElevation(input, fetchImpl = globalThis.fetch) {
 
 export function getBrowserLocation(geolocation = globalThis.navigator?.geolocation) {
   if (!geolocation) {
-    return Promise.reject(new Error('Geolocation is not supported by this browser.'));
+    return Promise.reject(new Error('הדפדפן אינו תומך באיתור מיקום.'));
   }
 
   return new Promise((resolve, reject) => {
@@ -173,19 +173,19 @@ export function getBrowserLocation(geolocation = globalThis.navigator?.geolocati
 }
 
 function geolocationErrorMessage(error) {
-  if (error?.code === 1) return 'Location permission was denied.';
-  if (error?.code === 2) return 'Your location is unavailable.';
-  if (error?.code === 3) return 'Location request timed out.';
-  return 'Could not get your location.';
+  if (error?.code === 1) return 'ההרשאה לאיתור המיקום נדחתה.';
+  if (error?.code === 2) return 'לא ניתן לקבל את המיקום הנוכחי.';
+  if (error?.code === 3) return 'הבקשה לאיתור המיקום חרגה מזמן ההמתנה.';
+  return 'לא ניתן לקבל את המיקום.';
 }
 
 export function formatLocalDateTime(date = new Date()) {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat('he-IL', {
     dateStyle: 'full',
     timeStyle: 'medium',
   }).format(date);
 }
 
 export function formatLocalDate(date = new Date()) {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'full' }).format(parseLocalDateTime(date));
+  return new Intl.DateTimeFormat('he-IL', { dateStyle: 'full' }).format(parseLocalDateTime(date));
 }

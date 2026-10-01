@@ -151,14 +151,14 @@ function renderTemporalClock(now = new Date()) {
       current: temporalSchedule.current,
       next: temporalSchedule.next,
     });
-    temporalPeriod.textContent = result.period;
+    temporalPeriod.textContent = result.period === 'DAY' ? 'יום' : 'לילה';
     temporalTime.textContent = formatTemporalTime(result);
     temporalInterval.textContent = `${formatLocalDateTime(result.periodStart)} → ${formatLocalDateTime(result.periodEnd)}`;
-    temporalPeriodDuration.textContent = `${((result.periodEnd-result.periodStart)/60_000).toFixed(6)} ordinary minutes`;
-    temporalHourDuration.textContent = `${(result.temporalHourDurationMilliseconds/60_000).toFixed(6)} ordinary minutes`;
+    temporalPeriodDuration.textContent = `${((result.periodEnd-result.periodStart)/60_000).toFixed(6)} דקות רגילות`;
+    temporalHourDuration.textContent = `${(result.temporalHourDurationMilliseconds/60_000).toFixed(6)} דקות רגילות`;
     temporalContext.textContent = temporalIsLive
-      ? 'Live result for the current device date'
-      : `Diagnostic preview for ${formatLocalDate(referenceTime)} at 12:00`;
+      ? 'תוצאה עדכנית לתאריך הנוכחי של המכשיר'
+      : `תצוגת בדיקה לתאריך ${formatLocalDate(referenceTime)} בשעה 12:00`;
   }
   if (!displaySchedule) {
     return;
@@ -172,7 +172,7 @@ function renderTemporalClock(now = new Date()) {
   });
   const clockModel = createClockFaceModel(displaySchedule, clockTime);
   renderClockFace(clockSvg, clockModel);
-  clockReadout.textContent = `Astronomical ${displayResult.period} time — ${formatTemporalTime(displayResult)}`;
+  clockReadout.textContent = `${displayResult.period === 'DAY' ? 'שעת היום הזמנית' : 'שעת הלילה הזמנית'} — ${formatTemporalTime(displayResult)}`;
   const table = createDayHourTable(displaySchedule, clockTime);
   if (boundaryIsLive) {
     const displayedBoundaries = clockTime < displaySchedule.current.dayEnd.time
@@ -180,7 +180,7 @@ function renderTemporalClock(now = new Date()) {
       : displaySchedule.next;
     renderCrossings(displayedBoundaries);
   }
-  hourTableContext.textContent = `${formatLocalDate(table.start)} · DAY ${formatLocalDateTime(table.start)} → ${formatLocalDateTime(table.end)}`;
+  hourTableContext.textContent = `${formatLocalDate(table.start)} · יום ${formatLocalDateTime(table.start)} ← ${formatLocalDateTime(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {
     const tr = document.createElement('tr');
     if (row.isCurrent) tr.className = 'current-hour-row';
@@ -294,10 +294,10 @@ function calculateFromForm(targetTab = 'clock') {
     tabs.hours.disabled = displaySchedule === null;
     const persisted = saveLocation(confirmedLiveLocation);
     statusElement.textContent = persisted
-      ? 'Saved for this browser session.'
-      : `Location confirmed for this session: ${confirmedLiveLocation.latitude}, ${confirmedLiveLocation.longitude}, ${confirmedLiveLocation.elevation} m. Browser storage was unavailable.`;
+      ? 'המיקום נשמר למשך הפעלת הדפדפן הנוכחית.'
+      : `המיקום אושר להפעלה זו: ${confirmedLiveLocation.latitude}, ${confirmedLiveLocation.longitude}, ${confirmedLiveLocation.elevation} מ׳. אחסון הדפדפן אינו זמין.`;
     showMapLink(confirmedLiveLocation);
-    primaryLocationButton.textContent = 'Done';
+    primaryLocationButton.textContent = 'סיום';
     revertLocationButton.hidden = false;
     revertLocationButton.disabled = true;
     if (!tabs[targetTab].disabled) selectTab(targetTab);
@@ -320,7 +320,7 @@ function updateDraftState() {
     || longitudeInput.value !== String(savedLocation.longitude)
     || elevationInput.value !== String(savedLocation.elevation);
   revertLocationButton.disabled = !changed;
-  if (changed) statusElement.textContent = 'Unsaved changes.';
+  if (changed) statusElement.textContent = 'קיימים שינויים שלא נשמרו.';
 }
 
 function updateDraftMapLink() {
@@ -346,25 +346,25 @@ revertLocationButton.addEventListener('click', () => {
   elevationInput.value = savedLocation.elevation;
   updateDraftMapLink();
   revertLocationButton.disabled = true;
-  statusElement.textContent = 'Changes reverted to the saved session location.';
+  statusElement.textContent = 'השינויים בוטלו והמיקום השמור שוחזר.';
 });
 
 deviceDateButton.addEventListener('click', () => {
   calculationDateInput.value = formatLocalDateInput();
-  statusElement.textContent = 'Calculation date reset to the device date.';
+  statusElement.textContent = 'תאריך החישוב הוחזר לתאריך הנוכחי של המכשיר.';
 });
 
 elevationButton.addEventListener('click', async () => {
   elevationButton.disabled = true;
   elevationSource.hidden = true;
-  statusElement.textContent = 'Getting estimated terrain elevation from Open-Meteo…';
+  statusElement.textContent = 'מתקבל אומדן גובה פני הים מ־Open-Meteo…';
   try {
     const result = await getTerrainElevation(currentFormValues());
     elevationInput.value = result.elevation;
-    elevationSource.textContent = `Estimated terrain elevation from ${result.provider}, ${result.dataset}. You can edit this value.`;
+    elevationSource.textContent = `אומדן גובה פני הים התקבל מ־${result.provider}, ${result.dataset}. ניתן לערוך את הערך.`;
     elevationSource.hidden = false;
     clearValidity();
-    statusElement.textContent = `Estimated terrain elevation received: ${result.elevation} m.`;
+    statusElement.textContent = `התקבל אומדן גובה פני הים: ${result.elevation} מ׳.`;
   } catch (error) {
     if (error instanceof LocationValidationError) showValidationErrors(error.errors);
     else statusElement.textContent = error.message;
@@ -375,7 +375,7 @@ elevationButton.addEventListener('click', async () => {
 
 locationButton.addEventListener('click', async () => {
   locationButton.disabled = true;
-  statusElement.textContent = 'Getting your location…';
+  statusElement.textContent = 'מתקבל המיקום הנוכחי…';
   try {
     const location = await getBrowserLocation();
     latitudeInput.value = location.latitude;
@@ -383,8 +383,8 @@ locationButton.addEventListener('click', async () => {
     elevationInput.value = location.elevation ?? '';
     clearValidity();
     statusElement.textContent = location.elevation === null
-      ? 'Coordinates received. Elevation was not provided by the device; enter it manually before continuing.'
-      : 'Location received. Review it and continue.';
+      ? 'הקואורדינטות התקבלו. המכשיר לא סיפק גובה פני ים; יש להזין אותו ידנית לפני ההמשך.'
+      : 'המיקום התקבל. ניתן לבדוק אותו ולהמשיך.';
     showMapLink(location);
     updateDraftState();
   } catch (error) {

@@ -59,7 +59,7 @@ describe('M3 BoundaryRule', () => {
       throw new Error('Expected invalid elevation to be rejected.');
     } catch (error) {
       expect(error.message).toBe('Invalid location');
-      expect(error.errors.elevation).toContain('−500 and 10,000');
+      expect(error.errors.elevation).toContain('−500 ל־10,000');
     }
   });
 });

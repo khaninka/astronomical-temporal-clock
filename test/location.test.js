@@ -21,9 +21,9 @@ describe('validateLocation', () => {
       validateLocation({ latitude: '', longitude: '181', elevation: 'Infinity' });
     } catch (error) {
       expect(error.errors).toEqual({
-        latitude: 'This field is required.',
-        longitude: 'Longitude must be between −180 and 180.',
-        elevation: 'Enter a finite number.',
+        latitude: 'זהו שדה חובה.',
+        longitude: 'קו האורך חייב להיות בין ‎−180 ל־180.',
+        elevation: 'יש להזין מספר תקין.',
       });
     }
   });
@@ -114,7 +114,7 @@ describe('getTerrainElevation', () => {
       json: async () => ({ elevation: [null] }),
     });
     await expect(getTerrainElevation({ latitude: 31.8, longitude: 35.2 }, fetchImpl))
-      .rejects.toThrow('No terrain elevation');
+      .rejects.toThrow('אין נתון גובה פני ים');
   });
 
   it('does not call the service for invalid coordinates', async () => {
@@ -149,11 +149,11 @@ describe('getBrowserLocation', () => {
 
   it('returns a useful message when permission is denied', async () => {
     const geolocation = { getCurrentPosition: (_success, failure) => failure({ code: 1 }) };
-    await expect(getBrowserLocation(geolocation)).rejects.toThrow('Location permission was denied.');
+    await expect(getBrowserLocation(geolocation)).rejects.toThrow('ההרשאה לאיתור המיקום נדחתה.');
   });
 
   it('rejects when the API is unavailable', async () => {
-    await expect(getBrowserLocation(null)).rejects.toThrow('Geolocation is not supported');
+    await expect(getBrowserLocation(null)).rejects.toThrow('הדפדפן אינו תומך באיתור מיקום');
   });
 });
 

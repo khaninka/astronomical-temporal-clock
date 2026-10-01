@@ -3,7 +3,7 @@ import { compareTimeToShkiah } from './boundary-rule.js';
 
 function displayCrossing(crossing, label) {
   if (crossing?.state === 'NO_CROSSING') {
-    return { state: 'NO_CROSSING', localTime: `No ${label.toLowerCase()} crossing on this date`, utcTime: null };
+    return { state: 'NO_CROSSING', localTime: `אין ${label} בתאריך זה`, utcTime: null };
   }
   if (crossing?.state !== 'FOUND' || !(crossing.time instanceof Date)
     || Number.isNaN(crossing.time.getTime())) {
@@ -33,21 +33,21 @@ export function createCrossingDisplayModel(calculation, referenceTime = new Date
     ? compareTimeToShkiah(referenceTime, calculation.shkiah)
     : null;
   const comparisonText = {
-    BEFORE_SHKIAH: 'Current device time is before visible sunset.',
-    AT_OR_AFTER_SHKIAH: 'Current device time is at or after visible sunset; the new evening cycle has begun.',
-    NO_SHKIAH: 'Visible sunset does not occur on this date.',
+    BEFORE_SHKIAH: 'השעה הנוכחית במכשיר היא לפני השקיעה הנראית.',
+    AT_OR_AFTER_SHKIAH: 'השעה הנוכחית במכשיר היא לאחר השקיעה הנראית; מחזור הערב החדש החל.',
+    NO_SHKIAH: 'אין שקיעה נראית בתאריך זה.',
   }[comparison] ?? null;
   return {
     date: formatLocalDate(calculation.localDateTime),
-    reference: 'Astronomical horizon',
+    reference: 'אופק אסטרונומי',
     horizonDip: `${calculation.horizonDip.toFixed(6)}°`,
     morningTargetAltitude: `${calculation.morningTargetAltitude.toFixed(6)}°`,
     eveningTargetAltitude: `${calculation.eveningTargetAltitude.toFixed(6)}°`,
-    netz: displayCrossing(calculation.netz, 'Visible sunrise'),
-    shkiah: displayCrossing(calculation.shkiah, 'Visible sunset'),
-    dayStart: displayCrossing(calculation.dayStart, 'DAY start'),
-    dayEnd: displayCrossing(calculation.dayEnd, 'DAY end'),
-    tzeitShabbat: displayCrossing(calculation.tzeitShabbat, 'Shabbat end'),
+    netz: displayCrossing(calculation.netz, 'נץ נראה'),
+    shkiah: displayCrossing(calculation.shkiah, 'שקיעה נראית'),
+    dayStart: displayCrossing(calculation.dayStart, 'תחילת היום'),
+    dayEnd: displayCrossing(calculation.dayEnd, 'סוף היום'),
+    tzeitShabbat: displayCrossing(calculation.tzeitShabbat, 'צאת שבת'),
     liveComparison: comparisonText,
   };
 }

@@ -121,8 +121,8 @@ describe('Location browser integration', () => {
 
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
-    expect(document.querySelector('#status').textContent).toBe('Saved for this browser session.');
-    expect(document.querySelector('#location-next').textContent).toBe('Done');
+    expect(document.querySelector('#status').textContent).toBe('המיקום נשמר למשך הפעלת הדפדפן הנוכחית.');
+    expect(document.querySelector('#location-next').textContent).toBe('סיום');
     expect(document.querySelector('#status').textContent).not.toContain('00:00:00');
     expect(document.querySelector('#local-date-time').textContent).not.toBe('');
     expect(document.querySelector('#map-link').hidden).toBe(false);
@@ -139,7 +139,7 @@ describe('Location browser integration', () => {
     expect(document.querySelector('#rising-target').textContent).toBe('-0.833300°');
     expect(Number.parseFloat(document.querySelector('#setting-target').textContent)).toBeLessThan(-0.8333);
     expect(Number.parseFloat(document.querySelector('#horizon-dip').textContent)).toBeGreaterThan(0);
-    expect(document.querySelector('#crossing-reference').textContent).toBe('Astronomical horizon');
+    expect(document.querySelector('#crossing-reference').textContent).toBe('אופק אסטרונומי');
     expect(document.querySelector('#rising-local').textContent).not.toBe('');
     expect(document.querySelector('#setting-local').textContent).not.toBe('');
     expect(document.querySelector('#day-start-local').textContent).not.toBe('');
@@ -198,9 +198,9 @@ describe('Location browser integration', () => {
     document.querySelector('#tab-clock').click();
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
-    expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
-    expect(document.querySelector('#temporal-period-duration').textContent).toMatch(/^\d+\.\d{6} ordinary minutes$/);
-    expect(document.querySelector('#temporal-hour-duration').textContent).toMatch(/^\d+\.\d{6} ordinary minutes$/);
+    expect(document.querySelector('#temporal-period').textContent).toBe('יום');
+    expect(document.querySelector('#temporal-period-duration').textContent).toMatch(/^\d+\.\d{6} דקות רגילות$/);
+    expect(document.querySelector('#temporal-hour-duration').textContent).toMatch(/^\d+\.\d{6} דקות רגילות$/);
     const initial = document.querySelector('#temporal-time').textContent;
     expect(initial).toMatch(/^\d{2}:\d{2}:\d{2}\.\d{3}$/);
 
@@ -214,7 +214,7 @@ describe('Location browser integration', () => {
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
-    expect(document.querySelector('#temporal-context').textContent).toContain('Diagnostic preview');
+    expect(document.querySelector('#temporal-context').textContent).toContain('תצוגת בדיקה');
     document.querySelector('#tab-boundary').click();
     expect(document.querySelector('#crossing-results').hidden).toBe(false);
     expect(document.querySelector('#crossing-date').textContent).not.toBe('');
@@ -235,22 +235,22 @@ describe('Location browser integration', () => {
     document.querySelector('#longitude').value = String(observer.longitude);
     document.querySelector('#elevation').value = String(observer.elevation);
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical DAY time —');
-    expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
+    expect(document.querySelector('#clock-readout').textContent).toContain('שעת היום הזמנית —');
+    expect(document.querySelector('#temporal-period').textContent).toBe('יום');
     const dayBoundaryDate = document.querySelector('#crossing-date').textContent;
 
     vi.setSystemTime(afterDayEnd);
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical NIGHT time —');
-    expect(document.querySelector('#temporal-period').textContent).toBe('NIGHT');
+    expect(document.querySelector('#clock-readout').textContent).toContain('שעת הלילה הזמנית —');
+    expect(document.querySelector('#temporal-period').textContent).toBe('לילה');
     expect(document.querySelector('#crossing-date').textContent).not.toBe(dayBoundaryDate);
     const nightBoundaryDate = document.querySelector('#crossing-date').textContent;
 
     vi.setSystemTime(afterNextDayStart);
     window.dispatchEvent(new Event('pageshow'));
-    expect(document.querySelector('#clock-readout').textContent).toContain('Astronomical DAY time —');
-    expect(document.querySelector('#temporal-period').textContent).toBe('DAY');
-    expect(document.querySelector('#temporal-context').textContent).toContain('Live result');
+    expect(document.querySelector('#clock-readout').textContent).toContain('שעת היום הזמנית —');
+    expect(document.querySelector('#temporal-period').textContent).toBe('יום');
+    expect(document.querySelector('#temporal-context').textContent).toContain('תוצאה עדכנית');
     expect(document.querySelector('#crossing-date').textContent).toBe(nightBoundaryDate);
     expect(document.querySelector('#hour-table-context').textContent).not.toBe('');
   });
@@ -267,7 +267,7 @@ describe('Location browser integration', () => {
     await import('../src/app.js');
 
     document.querySelector('#use-location').click();
-    await vi.waitFor(() => expect(document.querySelector('#status').textContent).toContain('Location received'));
+    await vi.waitFor(() => expect(document.querySelector('#status').textContent).toContain('המיקום התקבל'));
 
     expect(document.querySelector('#latitude').value).toBe('40.7');
     expect(document.querySelector('#longitude').value).toBe('-74');
@@ -288,7 +288,7 @@ describe('Location browser integration', () => {
     await import('../src/app.js');
 
     document.querySelector('#use-location').click();
-    await vi.waitFor(() => expect(document.querySelector('#status').textContent).toContain('enter it manually'));
+    await vi.waitFor(() => expect(document.querySelector('#status').textContent).toContain('יש להזין אותו ידנית'));
 
     expect(document.querySelector('#elevation').value).toBe('');
     expect(document.querySelector('#map-link').hidden).toBe(false);

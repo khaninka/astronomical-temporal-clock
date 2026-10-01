@@ -1,66 +1,66 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Astronomical hours clock">
-    <title>Astronomical Hours</title>
+    <meta name="description" content="שעון השעות הזמניות">
+    <title>השעות הזמניות</title>
     <link rel="stylesheet" href="/src/styles.css">
   </head>
   <body>
     <main class="panel">
-      <header class="app-header"><h1>Astronomical Hours</h1></header>
-      <nav class="tab-list" role="tablist" aria-label="Clock sections">
-        <button id="tab-location" role="tab" aria-selected="true" aria-controls="view-location" type="button">Settings</button>
-        <button id="tab-clock" role="tab" aria-selected="false" aria-controls="clock-display" type="button" disabled>Clock</button>
-        <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>Day boundaries</button>
-        <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>Time calculation</button>
-        <button id="tab-hours" role="tab" aria-selected="false" aria-controls="hour-table-view" type="button" disabled>Day hours</button>
+      <header class="app-header"><h1>השעות הזמניות</h1></header>
+      <nav class="tab-list" role="tablist" aria-label="חלקי השעון">
+        <button id="tab-location" role="tab" aria-selected="true" aria-controls="view-location" type="button">הגדרות</button>
+        <button id="tab-clock" role="tab" aria-selected="false" aria-controls="clock-display" type="button" disabled>שעון</button>
+        <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>גבולות היום</button>
+        <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>חישוב הזמן</button>
+        <button id="tab-hours" role="tab" aria-selected="false" aria-controls="hour-table-view" type="button" disabled>שעות היום</button>
       </nav>
 
       <section id="view-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
-        <h2>Settings</h2>
-        <p class="intro">Set the observation point used by the clock.</p>
+        <h2>הגדרות</h2>
+        <p class="intro">הגדרת המיקום לחישוב השעות.</p>
         <form id="location-form" novalidate>
           <div class="coordinate-grid">
-            <label>Latitude
-              <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" required inputmode="decimal">
-              <span class="hint">−90 to 90 degrees</span>
+            <label>קו רוחב
+              <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" required inputmode="decimal" dir="ltr">
+              <span class="hint" dir="ltr">−90° – 90°</span>
             </label>
-            <label>Longitude
-              <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" required inputmode="decimal">
-              <span class="hint">−180 to 180 degrees</span>
+            <label>קו אורך
+              <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" required inputmode="decimal" dir="ltr">
+              <span class="hint" dir="ltr">−180° – 180°</span>
             </label>
           </div>
           <div class="coordinate-actions">
-            <button id="use-location" type="button">Use my location</button>
-            <a id="map-link" class="map-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Check coordinates in Google Maps</a>
+            <button id="use-location" type="button">שימוש במיקום הנוכחי</button>
+            <a id="map-link" class="map-link" href="#" target="_blank" rel="noopener noreferrer" hidden>בדיקת המיקום במפות Google</a>
           </div>
-          <label>Elevation
+          <label>גובה פני הים
             <span class="elevation-row">
               <span class="input-with-unit">
-                <input id="elevation" name="elevation" type="number" min="-500" max="10000" step="any" required inputmode="decimal">
-                <span>m</span>
+                <input id="elevation" name="elevation" type="number" min="-500" max="10000" step="any" required inputmode="decimal" dir="ltr">
+                <span>מ׳</span>
               </span>
-              <button id="get-elevation" type="button">Get terrain elevation</button>
+              <button id="get-elevation" type="button">קבלת גובה פני הים</button>
             </span>
           </label>
           <p id="elevation-source" class="source-note elevation-source" hidden></p>
           <details class="test-controls">
-            <summary>Diagnostic test date</summary>
-            <label>Calculation date
-              <input id="calculation-date" name="localDateTime" type="date" required>
-              <span class="hint">Used by Day boundaries and Time calculation diagnostics only. The clock always uses today's device date.</span>
+            <summary>תאריך בדיקה</summary>
+            <label>תאריך החישוב
+              <input id="calculation-date" name="localDateTime" type="date" required dir="ltr">
+              <span class="hint">משמש רק לבדיקת גבולות היום וחישוב הזמן. השעון משתמש תמיד בתאריך הנוכחי של המכשיר.</span>
             </label>
-            <button id="use-device-date" type="button">Use device date</button>
+            <button id="use-device-date" type="button">שימוש בתאריך הנוכחי</button>
             <section class="device-time" aria-labelledby="device-time-heading">
-              <h2 id="device-time-heading">Device date and time</h2>
+              <h2 id="device-time-heading">התאריך והשעה במכשיר</h2>
               <time id="local-date-time"></time>
             </section>
           </details>
           <div class="form-actions">
-            <button id="revert-location" type="button" hidden disabled>Revert changes</button>
-            <button id="location-next" type="submit" class="primary">Next</button>
+            <button id="revert-location" type="button" hidden disabled>חזרה למיקום השמור</button>
+            <button id="location-next" type="submit" class="primary">הבא</button>
           </div>
         </form>
         <p id="status" role="status" aria-live="polite"></p>
@@ -72,37 +72,37 @@
       </section>
 
       <section id="crossing-results" class="tab-panel crossing-results" role="tabpanel" aria-labelledby="tab-boundary" hidden>
-        <h2>Day boundaries</h2>
-        <p class="result-context">Israel fixed-minute boundary model</p>
-        <p class="result-context"><span id="crossing-date"></span><span aria-hidden="true"> · </span><span id="crossing-reference"></span><span aria-hidden="true"> · </span>Ideal horizon dip <span id="horizon-dip"></span></p>
+        <h2>גבולות היום</h2>
+        <p class="result-context">שיטת גבולות ישראלית בדקות קבועות</p>
+        <p class="result-context"><span id="crossing-date"></span><span aria-hidden="true"> · </span><span id="crossing-reference"></span><span aria-hidden="true"> · </span>הנמכת האופק המחושבת <span id="horizon-dip" dir="ltr"></span></p>
         <dl>
-          <div><dt>DAY starts · <span lang="he" dir="rtl">עלות השחר</span> · sunrise −72 min</dt><dd id="day-start-local"></dd><dd id="day-start-utc" class="utc-time"></dd></div>
-          <div><dt><span lang="he" dir="rtl">נץ החמה הנראה</span> · visible sunrise · <span id="rising-target"></span></dt><dd id="rising-local"></dd><dd id="rising-utc" class="utc-time"></dd></div>
-          <div><dt><span lang="he" dir="rtl">שקיעת החמה</span> · visible sunset · <span id="setting-target"></span></dt><dd id="setting-local"></dd><dd id="setting-utc" class="utc-time"></dd></div>
-          <div><dt><span lang="he" dir="rtl">צאת שבת</span> · Shabbat ends · sunset +36 min</dt><dd id="tzeit-shabbat-local"></dd><dd id="tzeit-shabbat-utc" class="utc-time"></dd></div>
-          <div><dt>DAY ends · <span lang="he" dir="rtl">צאת כוכבים</span> · nightfall · sunset +72 min</dt><dd id="day-end-local"></dd><dd id="day-end-utc" class="utc-time"></dd></div>
+          <div><dt>תחילת היום · עלות השחר · 72 דקות לפני הנץ</dt><dd id="day-start-local"></dd><dd id="day-start-utc" class="utc-time" dir="ltr"></dd></div>
+          <div><dt>נץ החמה הנראה · <span id="rising-target" dir="ltr"></span></dt><dd id="rising-local"></dd><dd id="rising-utc" class="utc-time" dir="ltr"></dd></div>
+          <div><dt>שקיעת החמה · <span id="setting-target" dir="ltr"></span></dt><dd id="setting-local"></dd><dd id="setting-utc" class="utc-time" dir="ltr"></dd></div>
+          <div><dt>צאת שבת · 36 דקות לאחר השקיעה</dt><dd id="tzeit-shabbat-local"></dd><dd id="tzeit-shabbat-utc" class="utc-time" dir="ltr"></dd></div>
+          <div><dt>סוף היום · צאת הכוכבים · 72 דקות לאחר השקיעה</dt><dd id="day-end-local"></dd><dd id="day-end-utc" class="utc-time" dir="ltr"></dd></div>
         </dl>
         <p id="cycle-status" class="cycle-status" hidden></p>
-        <p class="source-note">This version intentionally uses the symmetric Israel fixed-minute model: DAY runs from visible sunrise −72 ordinary minutes to visible sunset +72 ordinary minutes. <span lang="he" dir="rtl">צאת שבת</span> at +36 minutes is informational and does not change the clock boundary. The model does not adapt twilight duration to latitude. <span lang="he" dir="rtl">שקיעת החמה</span> (visible sunset) uses elevation and an ideal unobstructed horizon. Surrounding terrain and buildings are not modelled.</p>
+        <p class="source-note">גרסה זו משתמשת במכוון בשיטה הישראלית הסימטרית של דקות קבועות: היום מתחיל 72 דקות לפני הנץ הנראה ומסתיים 72 דקות לאחר השקיעה הנראית. צאת שבת, 36 דקות לאחר השקיעה, מוצגת למידע בלבד ואינה משנה את גבול השעון. השיטה אינה מתאימה את משך הדמדומים לקו הרוחב. חישוב השקיעה משתמש בגובה פני הים ובאופק אידיאלי ללא חסימות; תוואי השטח והמבנים בסביבה אינם נכללים בחישוב.</p>
       </section>
 
       <section id="temporal-results" class="tab-panel crossing-results temporal-results" role="tabpanel" aria-labelledby="tab-temporal" hidden>
-        <h2>Time calculation</h2>
+        <h2>חישוב הזמן</h2>
         <p id="temporal-context" class="result-context"></p>
         <dl>
-          <div><dt>Period</dt><dd id="temporal-period"></dd></div>
-          <div><dt>Period boundaries</dt><dd id="temporal-interval"></dd></div>
-          <div><dt>Period duration</dt><dd id="temporal-period-duration"></dd></div>
-          <div><dt>Astronomical hour duration</dt><dd id="temporal-hour-duration"></dd></div>
-          <div><dt>Astronomical time</dt><dd id="temporal-time" class="temporal-time"></dd></div>
+          <div><dt>פרק הזמן</dt><dd id="temporal-period"></dd></div>
+          <div><dt>גבולות פרק הזמן</dt><dd id="temporal-interval"></dd></div>
+          <div><dt>משך פרק הזמן</dt><dd id="temporal-period-duration"></dd></div>
+          <div><dt>משך שעה זמנית</dt><dd id="temporal-hour-duration"></dd></div>
+          <div><dt>הזמן הזמני</dt><dd id="temporal-time" class="temporal-time"></dd></div>
         </dl>
       </section>
 
       <section id="hour-table-view" class="tab-panel hour-table-view" role="tabpanel" aria-labelledby="tab-hours" hidden>
-        <h2>Day hours</h2>
+        <h2>שעות היום</h2>
         <p id="hour-table-context" class="result-context"></p>
         <table class="hour-table">
-          <thead><tr><th scope="col">Hour</th><th scope="col">Starts</th><th scope="col">Ends</th></tr></thead>
+          <thead><tr><th scope="col">שעה</th><th scope="col">התחלה</th><th scope="col">סוף</th></tr></thead>
           <tbody id="hour-table-body"></tbody>
         </table>
       </section>

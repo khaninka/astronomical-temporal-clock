@@ -17,7 +17,7 @@ describe('SunCrossing display model', () => {
     expect(model.morningTargetAltitude).toBe('-0.833300°');
     expect(model.eveningTargetAltitude).toBe('-1.740102°');
     expect(model.horizonDip).toBe('0.906802°');
-    expect(model.reference).toBe('Astronomical horizon');
+    expect(model.reference).toBe('אופק אסטרונומי');
     expect(model.netz.localTime).toEqual(expect.any(String));
     expect(model.netz.utcTime).toBe('2026-09-22T03:27:10.125Z');
     expect(model.shkiah.utcTime).toBe('2026-09-22T15:35:42.500Z');
@@ -39,8 +39,8 @@ describe('SunCrossing display model', () => {
       dayEnd: { state: 'NO_CROSSING', time: null },
       tzeitShabbat: { state: 'NO_CROSSING', time: null },
     }, new Date(2026, 5, 22));
-    expect(model.netz).toEqual({ state: 'NO_CROSSING', localTime: 'No visible sunrise crossing on this date', utcTime: null });
-    expect(model.shkiah).toEqual({ state: 'NO_CROSSING', localTime: 'No visible sunset crossing on this date', utcTime: null });
+    expect(model.netz).toEqual({ state: 'NO_CROSSING', localTime: 'אין נץ נראה בתאריך זה', utcTime: null });
+    expect(model.shkiah).toEqual({ state: 'NO_CROSSING', localTime: 'אין שקיעה נראית בתאריך זה', utcTime: null });
   });
 
   it('compares device time with shkiah only for the selected current date', () => {
@@ -56,9 +56,9 @@ describe('SunCrossing display model', () => {
       tzeitShabbat: { state: 'FOUND', time: new Date(2026, 3, 19, 19, 51) },
     };
     expect(createCrossingDisplayModel(calculation, new Date(2026, 3, 19, 19, 14)).liveComparison)
-      .toContain('before visible sunset');
+      .toContain('לפני השקיעה הנראית');
     expect(createCrossingDisplayModel(calculation, new Date(2026, 3, 19, 19, 15)).liveComparison)
-      .toContain('new evening cycle');
+      .toContain('מחזור הערב החדש החל');
     expect(createCrossingDisplayModel(calculation, new Date(2026, 3, 20, 1)).liveComparison).toBeNull();
   });
 });

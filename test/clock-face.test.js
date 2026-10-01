@@ -59,7 +59,7 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.solar-hour-tick')).toHaveLength(13);
     expect([...svg.querySelectorAll('.solar-hour-label')].map(({ textContent }) => textContent))
       .toEqual(['נץ', 'שקיה']);
-    expect(svg.getAttribute('aria-label')).toContain('synchronized with ordinary time');
+    expect(svg.getAttribute('aria-label')).toContain('מסונכרנות עם הזמן הרגיל');
   });
 
   it('does not render the solar-hour arc during NIGHT', () => {
