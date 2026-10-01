@@ -79,10 +79,11 @@
           <div><dt>DAY starts · <span lang="he" dir="rtl">עלות השחר</span> · sunrise −72 min</dt><dd id="day-start-local"></dd><dd id="day-start-utc" class="utc-time"></dd></div>
           <div><dt><span lang="he" dir="rtl">נץ החמה הנראה</span> · visible sunrise · <span id="rising-target"></span></dt><dd id="rising-local"></dd><dd id="rising-utc" class="utc-time"></dd></div>
           <div><dt><span lang="he" dir="rtl">שקיעת החמה</span> · visible sunset · <span id="setting-target"></span></dt><dd id="setting-local"></dd><dd id="setting-utc" class="utc-time"></dd></div>
-          <div><dt>DAY ends · <span lang="he" dir="rtl">צאת הכוכבים לחומרא</span> · stringent nightfall · sunset +36 min</dt><dd id="day-end-local"></dd><dd id="day-end-utc" class="utc-time"></dd></div>
+          <div><dt><span lang="he" dir="rtl">צאת שבת</span> · Shabbat ends · sunset +36 min</dt><dd id="tzeit-shabbat-local"></dd><dd id="tzeit-shabbat-utc" class="utc-time"></dd></div>
+          <div><dt>DAY ends · <span lang="he" dir="rtl">צאת כוכבים</span> · nightfall · sunset +72 min</dt><dd id="day-end-local"></dd><dd id="day-end-utc" class="utc-time"></dd></div>
         </dl>
         <p id="cycle-status" class="cycle-status" hidden></p>
-        <p class="source-note">This version intentionally uses the Israel rule of fixed ordinary-minute offsets. It does not adapt twilight duration to latitude. <span lang="he" dir="rtl">שקיעת החמה</span> (visible sunset) uses elevation and an ideal unobstructed horizon. Surrounding terrain and buildings are not modelled.</p>
+        <p class="source-note">This version intentionally uses the symmetric Israel fixed-minute model: DAY runs from visible sunrise −72 ordinary minutes to visible sunset +72 ordinary minutes. <span lang="he" dir="rtl">צאת שבת</span> at +36 minutes is informational and does not change the clock boundary. The model does not adapt twilight duration to latitude. <span lang="he" dir="rtl">שקיעת החמה</span> (visible sunset) uses elevation and an ideal unobstructed horizon. Surrounding terrain and buildings are not modelled.</p>
       </section>
 
       <section id="temporal-results" class="tab-panel crossing-results temporal-results" role="tabpanel" aria-labelledby="tab-temporal" hidden>

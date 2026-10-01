@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ALOT_OFFSET_SECONDS, calculateLocationBoundaries, compareTimeToShkiah, geometricHorizonDip, TZEIT_LCHUMRA_OFFSET_SECONDS } from '../src/astronomy/boundary-rule.js';
+import { ALOT_OFFSET_SECONDS, calculateLocationBoundaries, compareTimeToShkiah, geometricHorizonDip, TZEIT_OFFSET_SECONDS, TZEIT_SHABBAT_OFFSET_SECONDS } from '../src/astronomy/boundary-rule.js';
 
 const location = {
   latitude: 31.8199732324092,
@@ -34,13 +34,15 @@ describe('M3 BoundaryRule', () => {
     expect(Math.abs(result.shkiah.time-new Date(expectedIso))).toBeLessThan(15_000);
   });
 
-  it('defines the only supported DAY boundaries as netz −72 and shkiah +36 minutes', () => {
+  it('defines the symmetric 72-minute DAY and the informational Shabbat marker', () => {
     const result = calculateLocationBoundaries({ ...location, localDateTime: '2026-09-22' });
     expect(ALOT_OFFSET_SECONDS).toBe(72*60);
-    expect(TZEIT_LCHUMRA_OFFSET_SECONDS).toBe(36*60);
+    expect(TZEIT_SHABBAT_OFFSET_SECONDS).toBe(36*60);
+    expect(TZEIT_OFFSET_SECONDS).toBe(72*60);
     expect(result.netz.time-result.dayStart.time).toBe(72*60*1000);
-    expect(result.dayEnd.time-result.shkiah.time).toBe(36*60*1000);
-    expect(result.offsets).toEqual({ alotSeconds: 4320, tzeitLchumraSeconds: 2160 });
+    expect(result.dayEnd.time-result.shkiah.time).toBe(72*60*1000);
+    expect(result.tzeitShabbat.time-result.shkiah.time).toBe(36*60*1000);
+    expect(result.offsets).toEqual({ alotSeconds: 4320, tzeitShabbatSeconds: 2160, tzeitSeconds: 4320 });
   });
 
   it('classifies the exact shkiah instant as the new evening cycle', () => {

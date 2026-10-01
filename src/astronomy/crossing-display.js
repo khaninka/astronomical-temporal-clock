@@ -47,6 +47,7 @@ export function createCrossingDisplayModel(calculation, referenceTime = new Date
     shkiah: displayCrossing(calculation.shkiah, 'Visible sunset'),
     dayStart: displayCrossing(calculation.dayStart, 'DAY start'),
     dayEnd: displayCrossing(calculation.dayEnd, 'DAY end'),
+    tzeitShabbat: displayCrossing(calculation.tzeitShabbat, 'Shabbat end'),
     liveComparison: comparisonText,
   };
 }

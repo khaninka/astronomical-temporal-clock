@@ -32,6 +32,8 @@ const dayStartLocal = document.querySelector('#day-start-local');
 const dayStartUtc = document.querySelector('#day-start-utc');
 const dayEndLocal = document.querySelector('#day-end-local');
 const dayEndUtc = document.querySelector('#day-end-utc');
+const tzeitShabbatLocal = document.querySelector('#tzeit-shabbat-local');
+const tzeitShabbatUtc = document.querySelector('#tzeit-shabbat-utc');
 const cycleStatus = document.querySelector('#cycle-status');
 const temporalResults = document.querySelector('#temporal-results');
 const temporalPeriod = document.querySelector('#temporal-period');
@@ -214,6 +216,7 @@ function renderCrossings(calculation) {
   renderCrossing(settingLocal, settingUtc, model.shkiah);
   renderCrossing(dayStartLocal, dayStartUtc, model.dayStart);
   renderCrossing(dayEndLocal, dayEndUtc, model.dayEnd);
+  renderCrossing(tzeitShabbatLocal, tzeitShabbatUtc, model.tzeitShabbat);
   cycleStatus.textContent = model.liveComparison ?? '';
   cycleStatus.hidden = model.liveComparison === null;
 }

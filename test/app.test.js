@@ -35,6 +35,7 @@ const formMarkup = `
     <span id="setting-local"></span><span id="setting-utc"></span>
     <span id="day-start-local"></span><span id="day-start-utc"></span>
     <span id="day-end-local"></span><span id="day-end-utc"></span>
+    <span id="tzeit-shabbat-local"></span><span id="tzeit-shabbat-utc"></span>
     <span id="cycle-status" hidden></span>
   </section>
   <section id="temporal-results" hidden>
@@ -143,6 +144,7 @@ describe('Location browser integration', () => {
     expect(document.querySelector('#setting-local').textContent).not.toBe('');
     expect(document.querySelector('#day-start-local').textContent).not.toBe('');
     expect(document.querySelector('#day-end-local').textContent).not.toBe('');
+    expect(document.querySelector('#tzeit-shabbat-local').textContent).not.toBe('');
   });
 
   it('auto-saves valid edits on tab change and can revert unsaved edits', async () => {

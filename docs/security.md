@@ -112,13 +112,13 @@ M2 has no critical or high findings and is safe to close for local development. 
 
 ## M3 BoundaryRule review — 2026-09-22
 
-M3 adds deterministic constant-time arithmetic plus two already-bounded `SunCrossing` calls. Elevation is restricted to `−500…10,000 m`; negative/sea-level elevation receives zero ideal-horizon dip. The DAY offsets are fixed constants (`−72 min`, `+36 min`) rather than untrusted inputs. Reference-time comparison accepts only a valid `Date` and treats exact shkiah as the new evening cycle. No network request, permission, storage, secret, backend, runtime dependency, or HTML execution sink was added.
+M3 adds deterministic constant-time arithmetic plus two already-bounded `SunCrossing` calls. Elevation is restricted to `−500…10,000 m`; negative/sea-level elevation receives zero ideal-horizon dip. The DAY offsets are fixed constants (`−72 min`, `+72 min`) rather than untrusted inputs; the informational `צאת שבת` marker is fixed at `+36 min`. Reference-time comparison accepts only a valid `Date`. No network request, permission, storage, secret, backend, runtime dependency, or HTML execution sink was added.
 
 The principal residual risk is model interpretation: ideal elevated-horizon shkiah ignores surrounding terrain and buildings. The UI states this explicitly. Three supplied calendar fixtures agree within 14 seconds. There are no critical or high M3 findings; the existing moderate Vitest-development advisory and deployment-header work remain unchanged.
 
 ### M3 conclusion
 
-The approved fixed `−72/+36` BoundaryRule, elevated-horizon shkiah, exact-boundary behavior, Location integration, calendar fixtures, browser output, and input limits pass. M3 is closed for local development. M4 may begin only on explicit user direction.
+The approved symmetric `−72/+72` BoundaryRule, informational `צאת שבת` at `+36`, elevated-horizon shkiah, exact-boundary behavior, Location integration, calendar fixtures, browser output, and input limits pass. M3 is closed for local development. M4 may begin only on explicit user direction.
 
 ## M4 TemporalClock review — 2026-09-22
 

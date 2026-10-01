@@ -12,7 +12,7 @@ The first implementation is a static browser application. It uses JavaScript ES 
 
 `Location → SunCrossing → BoundaryRule → TemporalClock → Display`
 
-The current branch is explicitly scoped to the Israel fixed-minute boundary model. It applies `עלות השחר = visible sunrise −72 ordinary minutes` and `צאת הכוכבים לחומרא = visible sunset +36 ordinary minutes`. It does not reinterpret these offsets as latitude-aware astronomical twilight. A future global angular model, if pursued, must be developed separately.
+The current branch is explicitly scoped to the symmetric Israel fixed-minute model associated here with the Magen Avraham approach. It applies `עלות השחר = visible sunrise −72 ordinary minutes` and `צאת כוכבים = visible sunset +72 ordinary minutes` as the DAY boundaries. It also reports the informational marker `צאת שבת = visible sunset +36 ordinary minutes`; this marker does not change the DAY/NIGHT boundary. It does not reinterpret these offsets as latitude-aware astronomical twilight. A future global angular model, if pursued, must be developed separately.
 
 Each module has one responsibility and later modules must not be folded into earlier ones.
 
@@ -83,14 +83,14 @@ This module converts solar events into the clock's DAY boundaries. The only v1 r
 
 ```text
 dayStart = netz − 72 ordinary minutes
-dayEnd   = elevated-horizon shkiah + 36 ordinary minutes
+dayEnd   = elevated-horizon shkiah + 72 ordinary minutes
 ```
 
 Netz is the standard `−0.8333°` morning crossing. `DAY start` is `Alot hashachar`, exactly 72 ordinary minutes before netz. The 90-minute stringent alternative is deliberately absent from v1: it is not a parameter, preset, or hidden option.
 
-The evening anchor (shkiah) uses an ideal elevated horizon: `−0.8333° − acos(R/(R+h))`, where `h` is terrain elevation above mean sea level and obstructions are ignored. This shkiah rule matched the three supplied calendar fixtures within 14 seconds. `DAY end` is `Tzeit hakochavim l'chumra`, exactly 36 ordinary minutes after this shkiah.
+The evening anchor (shkiah) uses an ideal elevated horizon: `−0.8333° − acos(R/(R+h))`, where `h` is terrain elevation above mean sea level and obstructions are ignored. This shkiah rule matched the three supplied calendar fixtures within 14 seconds. `DAY end` is `צאת כוכבים`, exactly 72 ordinary minutes after this shkiah. `צאת שבת`, 36 ordinary minutes after shkiah, is informational only.
 
-Shkiah remains an explicitly reported transition anchor; civil midnight does not reset the clock. The `−72/+36` rules and elevated-horizon policy belong here, not in the verified base `SunCrossing` mathematics. Alternative profiles are outside v1.
+Shkiah remains an explicitly reported transition anchor; civil midnight does not reset the clock. The symmetric `−72/+72` DAY rule and elevated-horizon policy belong here, not in the verified base `SunCrossing` mathematics. Alternative profiles are outside v1.
 
 ## 7. M4 — TemporalClock (not implemented)
 

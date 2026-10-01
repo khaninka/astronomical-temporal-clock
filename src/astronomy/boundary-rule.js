@@ -4,7 +4,8 @@ import { findSunCrossing } from './sun-crossing.js';
 
 const MEAN_EARTH_RADIUS_METRES = 6_371_008.8;
 export const ALOT_OFFSET_SECONDS = 72 * 60;
-export const TZEIT_LCHUMRA_OFFSET_SECONDS = 36 * 60;
+export const TZEIT_SHABBAT_OFFSET_SECONDS = 36 * 60;
+export const TZEIT_OFFSET_SECONDS = 72 * 60;
 
 function validateElevation(elevation) {
   if (!Number.isFinite(elevation)) throw new TypeError('elevation must be finite.');
@@ -54,8 +55,13 @@ export function calculateLocationBoundaries(
     netz,
     shkiah,
     dayStart: offsetCrossing(netz, ALOT_OFFSET_SECONDS, -1),
-    dayEnd: offsetCrossing(shkiah, TZEIT_LCHUMRA_OFFSET_SECONDS, 1),
-    offsets: { alotSeconds: ALOT_OFFSET_SECONDS, tzeitLchumraSeconds: TZEIT_LCHUMRA_OFFSET_SECONDS },
+    dayEnd: offsetCrossing(shkiah, TZEIT_OFFSET_SECONDS, 1),
+    tzeitShabbat: offsetCrossing(shkiah, TZEIT_SHABBAT_OFFSET_SECONDS, 1),
+    offsets: {
+      alotSeconds: ALOT_OFFSET_SECONDS,
+      tzeitShabbatSeconds: TZEIT_SHABBAT_OFFSET_SECONDS,
+      tzeitSeconds: TZEIT_OFFSET_SECONDS,
+    },
   };
 }
 

@@ -8,7 +8,7 @@ The next module starts only after the current module has passed unit testing, in
 
 1. **M1 Location** — normalize and validate WGS 84 coordinates/elevation, obtain browser geolocation, attach device-local date/time, unit-test, integrate into a small browser demo, and assess location privacy and browser permissions.
 2. **M2 SunCrossing** — approve the algorithm/reference/tolerance, implement solar crossings and sunrise/sunset, unit-test, integrate `Location → SunCrossing`, and review numeric denial-of-service and dependency risks.
-3. **M3 BoundaryRule** — implement the sole v1 rule `netz −72 min / elevated shkiah +36 min`, unit-test, integrate through M3, and review all new input paths.
+3. **M3 BoundaryRule** — implement the symmetric v1 DAY rule `netz −72 min / elevated shkiah +72 min`, report `צאת שבת` at `shkiah +36 min`, unit-test, integrate through M3, and review all new input paths.
 4. **M4 TemporalClock** — map DAY and NIGHT independently to twelve unequal hours, unit-test mathematical checkpoints, integrate the full computational pipeline, and review date/time boundary and resource-exhaustion risks.
 5. **M5 Display** — preserve the diagnostic display of every intermediate result, add the graphical temporal/civil clock face, complete integration/e2e and security testing, and verify production headers/CSP/privacy behavior.
 
