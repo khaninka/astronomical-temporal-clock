@@ -57,7 +57,7 @@ describe('Location browser integration', () => {
     vi.resetModules();
     sessionStorage.clear();
     document.body.innerHTML = formMarkup;
-    HTMLFormElement.prototype.reportValidity = vi.fn(() => true);
+    vi.spyOn(document.querySelector('#location-form'), 'reportValidity').mockReturnValue(true);
   });
 
   it('opens Location first and switches between enabled tabs', async () => {
@@ -85,6 +85,7 @@ describe('Location browser integration', () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
     vi.clearAllTimers();
     vi.useRealTimers();
