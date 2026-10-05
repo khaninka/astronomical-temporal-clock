@@ -3,6 +3,7 @@ import { calculateLocationBoundaries } from './astronomy/boundary-rule.js';
 import { createCrossingDisplayModel } from './astronomy/crossing-display.js';
 import { calculateLocationTemporalClock, calculateTemporalClock, formatTemporalTime } from './astronomy/temporal-clock.js';
 import { createClockFaceModel, createDayHourTable, renderClockFace } from './display/clock-face.js';
+import { millisecondsUntilNextOrdinarySecond, quantizeToOrdinarySecond } from './display/live-time.js';
 
 const form = document.querySelector('#location-form');
 const latitudeInput = document.querySelector('#latitude');
@@ -268,7 +269,7 @@ function calculateFromForm(targetTab = 'clock') {
     const diagnosticLocation = createLocationData(values);
     const crossings = calculateLocationBoundaries(diagnosticLocation);
     renderCrossings(crossings);
-    const now = new Date();
+    const now = quantizeToOrdinarySecond();
     boundaryIsLive = sameLocalDate(diagnosticLocation.localDateTime, now);
     temporalIsLive = sameLocalDate(diagnosticLocation.localDateTime, now);
     temporalReferenceTime = temporalIsLive
@@ -394,7 +395,7 @@ locationButton.addEventListener('click', async () => {
   }
 });
 
-renderDeviceTime();
+renderDeviceTime(quantizeToOrdinarySecond());
 calculationDateInput.value = formatLocalDateInput();
 selectTab('location');
 try {
@@ -408,15 +409,24 @@ try {
 } catch {
   sessionStorage.removeItem(LOCATION_STORAGE_KEY);
 }
-setInterval(() => {
-  const now = new Date();
+function updateLiveClock() {
+  const now = quantizeToOrdinarySecond();
   renderDeviceTime(now);
   renderTemporalClock(now);
-}, 1_000);
+}
+
+function scheduleLiveClockUpdate() {
+  setTimeout(() => {
+    updateLiveClock();
+    scheduleLiveClockUpdate();
+  }, millisecondsUntilNextOrdinarySecond());
+}
+
+scheduleLiveClockUpdate();
 
 function resumeLiveClock() {
   if (!liveLocation) return;
-  const now = new Date();
+  const now = quantizeToOrdinarySecond();
   refreshLiveSchedule(now, true);
   renderDeviceTime(now);
   renderTemporalClock(now);

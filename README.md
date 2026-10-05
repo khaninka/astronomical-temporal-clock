@@ -17,6 +17,8 @@ The project decisions are kept as separate documents rather than collapsed into 
 - [Development Plan](docs/development-plan.md)
 - [Security Assessment](docs/security.md)
 - [SunCrossing Reference Standard](docs/sun-crossing-reference.md)
+- [Chrome Extension Delivery Plan](docs/chrome-extension-plan.md)
+- [מדריך למשתמש בעברית](docs/user-guide-he.md)
 
 The astronomy implementation is based on the published report [NREL Solar Position Algorithm, NREL/TP-560-34302](https://docs.nlr.gov/docs/fy08osti/34302.pdf). It is an independent implementation; the separately licensed reference C source is not copied into this project.
 
@@ -61,6 +63,10 @@ Open the local URL printed by Vite. Browser geolocation is available in a secure
 ## GitHub Pages
 
 The production build uses the repository base path `/astronomical-temporal-clock/`. Pushes to `main` run the tests, build `dist`, and deploy that directory through `.github/workflows/deploy-pages.yml`. In the repository settings, select **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+## Future Chrome extension
+
+The working GitHub Pages application remains unchanged as an independent delivery target. A future Manifest V3 extension is planned as a separate Side Panel shell that reuses the tested browser-neutral calculation modules, needs no backend, and requests only narrowly scoped Chrome permissions. It is not yet implemented. See the [Chrome Extension Delivery Plan](docs/chrome-extension-plan.md).
 
 ## Test
 

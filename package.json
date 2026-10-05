@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:extension": "vite build --config vite.extension.config.js",
     "test": "vitest run",
     "verify:spa": "node scripts/verify-nrel-spa.js",
     "verify:oracle": "node scripts/verify-astronomy-engine.js",

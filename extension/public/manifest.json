@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "השעות הזמניות",
+  "description": "שעון שעות זמניות לפי המיקום והתאריך הנוכחיים.",
+  "version": "0.1.0",
+  "minimum_chrome_version": "114",
+  "action": {
+    "default_title": "פתיחת השעות הזמניות"
+  },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "permissions": [
+    "sidePanel",
+    "geolocation"
+  ],
+  "host_permissions": [
+    "https://api.open-meteo.com/*"
+  ]
+}

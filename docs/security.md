@@ -135,3 +135,11 @@ M5 adds no automatic network request, browser permission, secret, backend, exter
 ### Tabs and persistence addendum
 
 Five ARIA tabs separate Location, the clock, BoundaryRule, TemporalClock, and the active-period hour table. Disabled tabs prevent presenting unavailable calculations; arrow, Home, and End navigation is supported after tabs become available. The 13-row table is generated with DOM methods and `textContent` from the already validated, fixed-size schedule. Persistence is deliberately limited to three validated numbers in `sessionStorage`. Stored values are validated again before calculation, storage failures degrade to in-memory operation, and the device-local current date is regenerated on every load. No HTML interpretation, dependency, permission, or automatic transmission was added.
+
+## Planned Chrome extension security boundary — 2026-10-03
+
+The user approved a future Manifest V3 Side Panel extension as an additional delivery format. It must not replace or weaken the existing website. The extension is not implemented yet, so no Chrome permissions are currently present in the project.
+
+The planned permission ceiling is `sidePanel`, `storage`, `geolocation`, and a narrowly scoped Open-Meteo host permission. The extension must not request access to tabs, active pages, history, cookies, page contents, downloads, scripting, or broad host patterns. Location persistence will use `chrome.storage.session` and remain limited to validated latitude, longitude, and elevation for the Chrome session; dates and calculated results will not be stored.
+
+Manifest permissions, cross-origin requests, extension CSP, absence of remote executable code, package contents, storage lifetime, denial/error behavior, and Chrome Web Store disclosures require a new security gate before M6 release. Full constraints and acceptance criteria are recorded in [Chrome Extension Delivery Plan](chrome-extension-plan.md).

@@ -119,3 +119,5 @@ The first display is diagnostic, showing device-local time, inputs, all intermed
 ## 9. Explicit exclusions for the current milestone
 
 The completed browser prototype contains no weather input, light sensor, local-shadow model, backend, account, or framework. Its only persistence is validated latitude, longitude, and elevation in tab-scoped session storage.
+
+The future Chrome extension is a separate delivery target and is not part of the current web runtime. The website must remain independently buildable and deployable. The extension decision, storage boundary, minimum permissions, distribution model, and acceptance gate are defined in [Chrome Extension Delivery Plan](chrome-extension-plan.md).
