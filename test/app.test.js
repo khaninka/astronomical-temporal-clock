@@ -44,7 +44,7 @@ const formMarkup = `
     <span id="temporal-interval"></span><span id="temporal-period-duration"></span><span id="temporal-hour-duration"></span>
   </section>
   <section id="clock-display" hidden>
-    <svg id="clock-face"></svg><output id="clock-readout"></output>
+    <svg id="clock-face"></svg>
   </section>
   <section id="hour-table-view" hidden>
     <p id="hour-table-context"></p><table><tbody id="hour-table-body"></tbody></table>
@@ -195,7 +195,7 @@ describe('Location browser integration', () => {
     expect(document.querySelectorAll('#clock-face .temporal-sector')).toHaveLength(12);
     document.querySelector('#tab-hours').click();
     expect(document.querySelector('#hour-table-view').hidden).toBe(false);
-    expect(document.querySelectorAll('#hour-table-body tr')).toHaveLength(12);
+    expect(document.querySelectorAll('#hour-table-body tr')).toHaveLength(13);
     document.querySelector('#tab-clock').click();
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);
@@ -236,20 +236,20 @@ describe('Location browser integration', () => {
     document.querySelector('#longitude').value = String(observer.longitude);
     document.querySelector('#elevation').value = String(observer.elevation);
     document.querySelector('#location-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    expect(document.querySelector('#clock-readout').textContent).toContain('שעת היום הזמנית —');
+    expect(document.querySelector('#clock-face').classList.contains('day-mode')).toBe(true);
     expect(document.querySelector('#temporal-period').textContent).toBe('יום');
     const dayBoundaryDate = document.querySelector('#crossing-date').textContent;
 
     vi.setSystemTime(afterDayEnd);
     await vi.advanceTimersByTimeAsync(1_000);
-    expect(document.querySelector('#clock-readout').textContent).toContain('שעת הלילה הזמנית —');
+    expect(document.querySelector('#clock-face').classList.contains('night-mode')).toBe(true);
     expect(document.querySelector('#temporal-period').textContent).toBe('לילה');
     expect(document.querySelector('#crossing-date').textContent).not.toBe(dayBoundaryDate);
     const nightBoundaryDate = document.querySelector('#crossing-date').textContent;
 
     vi.setSystemTime(afterNextDayStart);
     window.dispatchEvent(new Event('pageshow'));
-    expect(document.querySelector('#clock-readout').textContent).toContain('שעת היום הזמנית —');
+    expect(document.querySelector('#clock-face').classList.contains('day-mode')).toBe(true);
     expect(document.querySelector('#temporal-period').textContent).toBe('יום');
     expect(document.querySelector('#temporal-context').textContent).toContain('תוצאה עדכנית');
     expect(document.querySelector('#crossing-date').textContent).toBe(nightBoundaryDate);

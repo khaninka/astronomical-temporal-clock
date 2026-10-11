@@ -134,20 +134,31 @@ export function createDayHourTable(schedule, referenceTime = new Date()) {
   const day = referenceTime < currentEnd ? schedule.current : schedule.next;
   const start = requireBoundary(day?.dayStart, 'displayedDay.dayStart');
   const end = requireBoundary(day?.dayEnd, 'displayedDay.dayEnd');
+  const solarStart = requireBoundary(day?.netz, 'displayedDay.netz');
+  const solarEnd = requireBoundary(day?.shkiah, 'displayedDay.shkiah');
   const duration = end-start;
+  const solarDuration = solarEnd-solarStart;
   if (duration <= 0) throw new RangeError('Displayed DAY boundaries must be strictly increasing.');
+  if (solarDuration <= 0) throw new RangeError('Displayed solar boundaries must be strictly increasing.');
   return {
     period: 'DAY',
     start,
     end,
-    rows: Array.from({ length: HOURS_PER_PERIOD }, (_, index) => {
-      const rowStart = timeAtFraction(start, end, index/HOURS_PER_PERIOD);
-      const rowEnd = timeAtFraction(start, end, (index+1)/HOURS_PER_PERIOD);
+    solarStart,
+    solarEnd,
+    rows: Array.from({ length: HOURS_PER_PERIOD+1 }, (_, hour) => {
+      const temporalTime = timeAtFraction(start, end, hour/HOURS_PER_PERIOD);
+      const solarTime = timeAtFraction(solarStart, solarEnd, hour/HOURS_PER_PERIOD);
+      const nextTemporalTime = hour === HOURS_PER_PERIOD
+        ? null
+        : timeAtFraction(start, end, (hour+1)/HOURS_PER_PERIOD);
       return {
-        hour: index+1,
-        start: rowStart,
-        end: rowEnd,
-        isCurrent: referenceTime >= rowStart && referenceTime < rowEnd,
+        hour,
+        temporalTime,
+        solarTime,
+        isCurrent: nextTemporalTime !== null
+          && referenceTime >= temporalTime
+          && referenceTime < nextTemporalTime,
       };
     }),
   };
@@ -207,7 +218,7 @@ export function renderClockFace(svg, model) {
     }
     const solarLabels = [
       { angle: model.solarArc.startAngle, text: 'נץ', edge: 'start' },
-      { angle: model.solarArc.endAngle, text: 'שקיה', edge: 'end' },
+      { angle: model.solarArc.endAngle, text: 'שקיעה', edge: 'end' },
     ];
     for (const item of solarLabels) {
       const point = polarPoint(SOLAR_ARC_RADIUS+22, item.angle);

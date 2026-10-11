@@ -58,7 +58,7 @@ describe('Display semicircle', () => {
     expect(svg.querySelectorAll('.solar-hours-arc')).toHaveLength(1);
     expect(svg.querySelectorAll('.solar-hour-tick')).toHaveLength(13);
     expect([...svg.querySelectorAll('.solar-hour-label')].map(({ textContent }) => textContent))
-      .toEqual(['נץ', 'שקיה']);
+      .toEqual(['נץ', 'שקיעה']);
     expect(svg.getAttribute('aria-label')).toContain('מסונכרנות עם הזמן הרגיל');
   });
 
@@ -103,9 +103,19 @@ describe('Display semicircle', () => {
     const table = createDayHourTable(schedule, new Date('2026-09-22T18:00:00'));
     expect(table.start).toEqual(schedule.current.dayStart.time);
     expect(table.end).toEqual(schedule.current.dayEnd.time);
-    expect(table.rows).toHaveLength(12);
-    expect(table.rows[0]).toMatchObject({ hour: 1, start: schedule.current.dayStart.time });
-    expect(table.rows[11]).toMatchObject({ hour: 12, end: schedule.current.dayEnd.time });
+    expect(table.solarStart).toEqual(schedule.current.netz.time);
+    expect(table.solarEnd).toEqual(schedule.current.shkiah.time);
+    expect(table.rows).toHaveLength(13);
+    expect(table.rows[0]).toMatchObject({
+      hour: 0,
+      temporalTime: schedule.current.dayStart.time,
+      solarTime: schedule.current.netz.time,
+    });
+    expect(table.rows[12]).toMatchObject({
+      hour: 12,
+      temporalTime: schedule.current.dayEnd.time,
+      solarTime: schedule.current.shkiah.time,
+    });
   });
 
   it('switches the DAY table to the next date at astronomical night', () => {
@@ -114,6 +124,8 @@ describe('Display semicircle', () => {
     expect(before.start).toEqual(schedule.current.dayStart.time);
     expect(after.start).toEqual(schedule.next.dayStart.time);
     expect(after.end).toEqual(schedule.next.dayEnd.time);
+    expect(after.solarStart).toEqual(schedule.next.netz.time);
+    expect(after.solarEnd).toEqual(schedule.next.shkiah.time);
     expect(after.rows.every(({ isCurrent }) => !isCurrent)).toBe(true);
   });
 

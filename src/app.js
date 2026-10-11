@@ -45,7 +45,6 @@ const temporalHourDuration = document.querySelector('#temporal-hour-duration');
 const temporalContext = document.querySelector('#temporal-context');
 const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
-const clockReadout = document.querySelector('#clock-readout');
 const hourTableView = document.querySelector('#hour-table-view');
 const hourTableContext = document.querySelector('#hour-table-context');
 const hourTableBody = document.querySelector('#hour-table-body');
@@ -165,15 +164,8 @@ function renderTemporalClock(now = new Date()) {
     return;
   }
   const clockTime = displayIsLive ? now : displayReferenceTime;
-  const displayResult = calculateTemporalClock({
-    referenceTime: clockTime,
-    previous: displaySchedule.previous,
-    current: displaySchedule.current,
-    next: displaySchedule.next,
-  });
   const clockModel = createClockFaceModel(displaySchedule, clockTime);
   renderClockFace(clockSvg, clockModel);
-  clockReadout.textContent = `${displayResult.period === 'DAY' ? 'שעת היום הזמנית' : 'שעת הלילה הזמנית'} — ${formatTemporalTime(displayResult)}`;
   const table = createDayHourTable(displaySchedule, clockTime);
   if (boundaryIsLive) {
     const displayedBoundaries = clockTime < displaySchedule.current.dayEnd.time
@@ -181,21 +173,21 @@ function renderTemporalClock(now = new Date()) {
       : displaySchedule.next;
     renderCrossings(displayedBoundaries);
   }
-  hourTableContext.textContent = `${formatLocalDate(table.start)} · יום ${formatLocalDateTime(table.start)} ← ${formatLocalDateTime(table.end)}`;
+  const timeFormatter = new Intl.DateTimeFormat('he-IL', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  });
+  hourTableContext.textContent = `${formatLocalDate(table.start)} · עלות השחר ${timeFormatter.format(table.start)} ← צאת הכוכבים ${timeFormatter.format(table.end)}`;
   hourTableBody.replaceChildren(...table.rows.map((row) => {
     const tr = document.createElement('tr');
     if (row.isCurrent) tr.className = 'current-hour-row';
     const astronomical = document.createElement('th');
     astronomical.scope = 'row';
     astronomical.textContent = String(row.hour);
-    const start = document.createElement('td');
-    const end = document.createElement('td');
-    const timeFormatter = new Intl.DateTimeFormat(undefined, {
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
-    });
-    start.textContent = timeFormatter.format(row.start);
-    end.textContent = timeFormatter.format(row.end);
-    tr.append(astronomical, start, end);
+    const temporalStart = document.createElement('td');
+    const solarStart = document.createElement('td');
+    temporalStart.textContent = timeFormatter.format(row.temporalTime);
+    solarStart.textContent = timeFormatter.format(row.solarTime);
+    tr.append(astronomical, temporalStart, solarStart);
     return tr;
   }));
 }

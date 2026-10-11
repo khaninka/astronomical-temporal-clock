@@ -97,10 +97,10 @@ button:disabled { cursor: wait; opacity: .6; }
 .crossing-results .source-note { margin: 0; }
 .cycle-status { margin: 0 0 1rem; padding: .7rem; border-left: .25rem solid #315b3f; background: #eaf2e9; }
 .temporal-results .temporal-time { font-size: 1.6rem; font-weight: 750; letter-spacing: .04em; }
-.clock-display { margin: 1.5rem 0 0; padding: 1.25rem; border: 0; border-radius: .75rem; background: transparent; text-align: center; }
+.clock-display { margin: 1rem 0 0; padding: .5rem 0 0; border: 0; border-radius: .75rem; background: transparent; text-align: center; }
 .clock-display[hidden] { display: none; }
 .clock-display h2 { margin: 0; font-size: 1.25rem; }
-.clock-face { display: block; width: min(100%, 38rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
+.clock-face { display: block; width: min(100%, 42rem); height: auto; margin: 0 auto; overflow: visible; border-radius: 50% 50% .5rem .5rem; }
 .solar-hours-arc { fill: none; stroke: #9a6b25; stroke-width: 2.5; }
 .solar-hour-tick { stroke: #9a6b25; stroke-width: 2; stroke-linecap: round; }
 .solar-hour-label { fill: #694817; dominant-baseline: middle; font-size: 11px; font-weight: 750; }
@@ -139,7 +139,6 @@ button:disabled { cursor: wait; opacity: .6; }
 .night-mode .time-lens { stroke: #6d8ca4; }
 .ordinary-time { dominant-baseline: middle; text-anchor: middle; fill: #17211b; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .night-mode .ordinary-time { fill: #17211b; }
-.clock-readout { display: block; margin-top: .5rem; font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .hour-table-view h2 { margin: 0; }
 .hour-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .hour-table th, .hour-table td { padding: .7rem .8rem; border-bottom: 1px solid #dce2da; text-align: left; }
