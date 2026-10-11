@@ -47,7 +47,7 @@ const formMarkup = `
     <svg id="clock-face"></svg>
   </section>
   <section id="hour-table-view" hidden>
-    <p id="hour-table-context"></p><table><tbody id="hour-table-body"></tbody></table>
+    <p id="hour-table-date"></p><table><tbody id="hour-table-body"></tbody></table>
   </section>
 `;
 
@@ -253,7 +253,7 @@ describe('Location browser integration', () => {
     expect(document.querySelector('#temporal-period').textContent).toBe('יום');
     expect(document.querySelector('#temporal-context').textContent).toContain('תוצאה עדכנית');
     expect(document.querySelector('#crossing-date').textContent).toBe(nightBoundaryDate);
-    expect(document.querySelector('#hour-table-context').textContent).not.toBe('');
+    expect(document.querySelector('#hour-table-date').textContent).not.toBe('');
   });
 
   it('fills editable fields from browser geolocation', async () => {

@@ -90,44 +90,6 @@ export function createClockFaceModel(schedule, referenceTime = new Date()) {
   };
 }
 
-export function createClockFacePreviewModel(schedule, referenceTime, temporalHour) {
-  const liveModel = createClockFaceModel(schedule, referenceTime);
-  if (![0, 3, 6, 9, 12].includes(temporalHour)) {
-    throw new RangeError('temporalHour must be one of 0, 3, 6, 9, or 12.');
-  }
-  const fraction = temporalHour/HOURS_PER_PERIOD;
-  const previewTime = timeAtFraction(liveModel.start, liveModel.end, fraction);
-  return {
-    ...liveModel,
-    fraction,
-    pointerAngle: START_ANGLE+fraction*SWEEP_ANGLE,
-    referenceTime: previewTime,
-    ordinaryTime: formatClockTime(previewTime),
-    segments: liveModel.segments.map((segment, index) => ({
-      ...segment,
-      isCurrent: temporalHour === HOURS_PER_PERIOD
-        ? index === HOURS_PER_PERIOD-1
-        : fraction >= index/HOURS_PER_PERIOD && fraction < (index+1)/HOURS_PER_PERIOD,
-    })),
-  };
-}
-
-export function createTemporalHourTable(schedule, referenceTime = new Date()) {
-  const model = createClockFaceModel(schedule, referenceTime);
-  const currentHour = Math.min(HOURS_PER_PERIOD-1, Math.floor(model.fraction*HOURS_PER_PERIOD));
-  return {
-    period: model.period,
-    start: model.start,
-    end: model.end,
-    rows: Array.from({ length: HOURS_PER_PERIOD+1 }, (_, hour) => ({
-      hour,
-      time: hour === 0 ? model.start : model.segments[hour-1].end,
-      isCurrent: hour === currentHour,
-      isPeriodEnd: hour === HOURS_PER_PERIOD,
-    })),
-  };
-}
-
 export function createDayHourTable(schedule, referenceTime = new Date()) {
   requireDate(referenceTime, 'referenceTime');
   const currentEnd = requireBoundary(schedule?.current?.dayEnd, 'current.dayEnd');

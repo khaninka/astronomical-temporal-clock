@@ -140,7 +140,8 @@ button:disabled { cursor: wait; opacity: .6; }
 .ordinary-time { dominant-baseline: middle; text-anchor: middle; fill: #17211b; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .night-mode .ordinary-time { fill: #17211b; }
 .hour-table-view h2 { margin: 0; }
-.hour-table-view .solar-table-context { margin-top: -.55rem; }
+.hour-table-view .hour-table-rule { margin: -.55rem 0 .75rem; }
+.hour-table-view .hour-table-rule + .hour-table-rule { margin-top: -.55rem; }
 .hour-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .hour-table th, .hour-table td { padding: .7rem .8rem; border-bottom: 1px solid #dce2da; text-align: left; }
 .hour-table thead th { color: #5c675f; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }

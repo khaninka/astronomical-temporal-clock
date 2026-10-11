@@ -46,7 +46,7 @@ const temporalContext = document.querySelector('#temporal-context');
 const clockDisplay = document.querySelector('#clock-display');
 const clockSvg = document.querySelector('#clock-face');
 const hourTableView = document.querySelector('#hour-table-view');
-const hourTableContext = document.querySelector('#hour-table-context');
+const hourTableDate = document.querySelector('#hour-table-date');
 const hourTableBody = document.querySelector('#hour-table-body');
 const tabs = {
   location: document.querySelector('#tab-location'),
@@ -68,8 +68,6 @@ let temporalReferenceTime = null;
 let temporalIsLive = false;
 let boundaryIsLive = false;
 let displaySchedule = null;
-let displayReferenceTime = null;
-let displayIsLive = false;
 let savedLocation = null;
 let liveLocation = null;
 let displayScheduleDate = null;
@@ -163,7 +161,7 @@ function renderTemporalClock(now = new Date()) {
   if (!displaySchedule) {
     return;
   }
-  const clockTime = displayIsLive ? now : displayReferenceTime;
+  const clockTime = now;
   const clockModel = createClockFaceModel(displaySchedule, clockTime);
   renderClockFace(clockSvg, clockModel);
   const table = createDayHourTable(displaySchedule, clockTime);
@@ -176,7 +174,7 @@ function renderTemporalClock(now = new Date()) {
   const timeFormatter = new Intl.DateTimeFormat('he-IL', {
     hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
   });
-  hourTableContext.textContent = `${formatLocalDate(table.start)} · עלות השחר ${timeFormatter.format(table.start)} ← צאת הכוכבים ${timeFormatter.format(table.end)}`;
+  hourTableDate.textContent = formatLocalDate(table.start);
   hourTableBody.replaceChildren(...table.rows.map((row) => {
     const tr = document.createElement('tr');
     if (row.isCurrent) tr.className = 'current-hour-row';
@@ -274,8 +272,6 @@ function calculateFromForm(targetTab = 'clock') {
       longitude: confirmedLiveLocation.longitude,
       elevation: confirmedLiveLocation.elevation,
     };
-    displayIsLive = true;
-    displayReferenceTime = now;
     const liveTemporal = calculateLocationTemporalClock(confirmedLiveLocation, now);
     displaySchedule = liveTemporal.state === 'AVAILABLE' ? liveTemporal : null;
     displayScheduleDate = localDateKey(now);
