@@ -16,6 +16,7 @@
         <button id="tab-boundary" role="tab" aria-selected="false" aria-controls="crossing-results" type="button" disabled>גבולות היום</button>
         <button id="tab-temporal" role="tab" aria-selected="false" aria-controls="temporal-results" type="button" disabled>חישוב הזמן</button>
         <button id="tab-hours" role="tab" aria-selected="false" aria-controls="hour-table-view" type="button" disabled>שעות היום</button>
+        <button id="tab-prayer" role="tab" aria-selected="false" aria-controls="prayer-times-view" type="button" disabled>תפילת שחרית</button>
       </nav>
 
       <section id="view-location" class="tab-panel" role="tabpanel" aria-labelledby="tab-location">
@@ -106,6 +107,14 @@
           <thead><tr><th scope="col">שעה</th><th scope="col">שעה זמנית</th><th scope="col">שעת שמש</th></tr></thead>
           <tbody id="hour-table-body"></tbody>
         </table>
+      </section>
+
+      <section id="prayer-times-view" class="tab-panel prayer-times-view" role="tabpanel" aria-labelledby="tab-prayer" hidden>
+        <h2>זמני תפילת שחרית</h2>
+        <p id="prayer-times-date" class="result-context"></p>
+        <p class="result-context"><strong>עטיפת טלית:</strong> 6 דקות לאחר עלות השחר, כלומר 66 דקות לפני הנץ.</p>
+        <p id="prayer-times-day-type" class="result-context"></p>
+        <dl id="prayer-times-list" class="prayer-times-list"></dl>
       </section>
     </main>
     <script type="module" src="/src/app.js"></script>

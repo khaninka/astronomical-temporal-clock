@@ -4,6 +4,7 @@ import { createCrossingDisplayModel } from './astronomy/crossing-display.js';
 import { calculateLocationTemporalClock, calculateTemporalClock, formatTemporalTime } from './astronomy/temporal-clock.js';
 import { createClockFaceModel, createDayHourTable, renderClockFace } from './display/clock-face.js';
 import { millisecondsUntilNextOrdinarySecond, quantizeToOrdinarySecond } from './display/live-time.js';
+import { createMorningPrayerTimes } from './prayer-times.js';
 
 const form = document.querySelector('#location-form');
 const latitudeInput = document.querySelector('#latitude');
@@ -48,12 +49,17 @@ const clockSvg = document.querySelector('#clock-face');
 const hourTableView = document.querySelector('#hour-table-view');
 const hourTableDate = document.querySelector('#hour-table-date');
 const hourTableBody = document.querySelector('#hour-table-body');
+const prayerTimesView = document.querySelector('#prayer-times-view');
+const prayerTimesDate = document.querySelector('#prayer-times-date');
+const prayerTimesDayType = document.querySelector('#prayer-times-day-type');
+const prayerTimesList = document.querySelector('#prayer-times-list');
 const tabs = {
   location: document.querySelector('#tab-location'),
   clock: document.querySelector('#tab-clock'),
   boundary: document.querySelector('#tab-boundary'),
   temporal: document.querySelector('#tab-temporal'),
   hours: document.querySelector('#tab-hours'),
+  prayer: document.querySelector('#tab-prayer'),
 };
 const views = {
   location: document.querySelector('#view-location'),
@@ -61,6 +67,7 @@ const views = {
   boundary: crossingResults,
   temporal: temporalResults,
   hours: hourTableView,
+  prayer: prayerTimesView,
 };
 const LOCATION_STORAGE_KEY = 'astronomical-temporal-clock.location.v1';
 let temporalSchedule = null;
@@ -136,6 +143,7 @@ function refreshLiveSchedule(now, force = false) {
   displayScheduleDate = dateKey;
   tabs.clock.disabled = displaySchedule === null;
   tabs.hours.disabled = displaySchedule === null;
+  tabs.prayer.disabled = displaySchedule === null;
   return true;
 }
 
@@ -187,6 +195,20 @@ function renderTemporalClock(now = new Date()) {
     solarStart.textContent = timeFormatter.format(row.solarTime);
     tr.append(astronomical, temporalStart, solarStart);
     return tr;
+  }));
+  const prayerTimes = createMorningPrayerTimes(displaySchedule, clockTime);
+  prayerTimesDate.textContent = formatLocalDate(prayerTimes.date);
+  prayerTimesDayType.textContent = prayerTimes.isShabbat
+    ? 'סדר שבת: מזמור שיר 45 דקות וישתבח 15 דקות לפני הנץ.'
+    : 'סדר יום חול: מזמור שיר 25 דקות וישתבח 10 דקות לפני הנץ.';
+  prayerTimesList.replaceChildren(...prayerTimes.rows.map((row) => {
+    const wrapper = document.createElement('div');
+    const label = document.createElement('dt');
+    const value = document.createElement('dd');
+    label.textContent = row.label;
+    value.textContent = timeFormatter.format(row.time);
+    wrapper.append(label, value);
+    return wrapper;
   }));
 }
 
@@ -281,6 +303,7 @@ function calculateFromForm(targetTab = 'clock') {
     tabs.boundary.disabled = false;
     tabs.temporal.disabled = temporalSchedule === null;
     tabs.hours.disabled = displaySchedule === null;
+    tabs.prayer.disabled = displaySchedule === null;
     const persisted = saveLocation(confirmedLiveLocation);
     statusElement.textContent = persisted
       ? 'המיקום נשמר למשך הפעלת הדפדפן הנוכחית.'

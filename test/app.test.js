@@ -9,6 +9,7 @@ const formMarkup = `
     <button id="tab-boundary" aria-selected="false" disabled>Boundary</button>
     <button id="tab-temporal" aria-selected="false" disabled>Temporal</button>
     <button id="tab-hours" aria-selected="false" disabled>Hours</button>
+    <button id="tab-prayer" aria-selected="false" disabled>Prayer</button>
   </nav>
   <section id="view-location">
     <form id="location-form">
@@ -48,6 +49,9 @@ const formMarkup = `
   </section>
   <section id="hour-table-view" hidden>
     <p id="hour-table-date"></p><table><tbody id="hour-table-body"></tbody></table>
+  </section>
+  <section id="prayer-times-view" hidden>
+    <p id="prayer-times-date"></p><p id="prayer-times-day-type"></p><dl id="prayer-times-list"></dl>
   </section>
 `;
 
@@ -196,6 +200,11 @@ describe('Location browser integration', () => {
     document.querySelector('#tab-hours').click();
     expect(document.querySelector('#hour-table-view').hidden).toBe(false);
     expect(document.querySelectorAll('#hour-table-body tr')).toHaveLength(13);
+    document.querySelector('#tab-prayer').click();
+    expect(document.querySelector('#prayer-times-view').hidden).toBe(false);
+    expect(document.querySelectorAll('#prayer-times-list div')).toHaveLength(6);
+    expect(document.querySelector('#prayer-times-list dt').textContent).toBe('עטיפת טלית');
+    expect(document.querySelector('#prayer-times-date').textContent).not.toBe('');
     document.querySelector('#tab-clock').click();
     document.querySelector('#tab-temporal').click();
     expect(document.querySelector('#temporal-results').hidden).toBe(false);

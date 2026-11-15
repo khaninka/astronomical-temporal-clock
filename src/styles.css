@@ -147,5 +147,10 @@ button:disabled { cursor: wait; opacity: .6; }
 .hour-table thead th { color: #5c675f; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
 .hour-table tbody th { color: #315b3f; }
 .hour-table .current-hour-row { background: #eaf2e9; box-shadow: inset .25rem 0 #315b3f; }
+.prayer-times-view h2 { margin: 0; }
+.prayer-times-list { margin: 1rem 0 0; }
+.prayer-times-list div { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: baseline; padding: .8rem 0; border-bottom: 1px solid #dce2da; }
+.prayer-times-list dt { color: #315b3f; font-weight: 750; }
+.prayer-times-list dd { margin: 0; direction: ltr; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { .temporal-sector { transition: none; } }
 @media (max-width: 36rem) { .coordinate-grid, .elevation-row { grid-template-columns: 1fr; } .coordinate-actions { align-items: stretch; flex-direction: column; } .form-actions { flex-direction: column-reverse; } }
